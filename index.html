@@ -194,8 +194,14 @@
       }, [active, grid, words]);
 
       useEffect(() => {
-        if (active && cellRefs.current[active.key])
-          cellRefs.current[active.key].scrollIntoView({ block: "nearest", inline: "nearest" });
+        if (!active) return;
+        const cell = grid[active.key];
+        if (!cell) return;
+        const id = cell[active.dir];
+        const w = id != null ? words[id] : null;
+        const target = w ? w.keys[Math.floor(w.keys.length / 2)] : active.key;
+        const el = cellRefs.current[target];
+        if (el) el.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
       }, [active, cellPx]);
 
       const focusKbd = () => { if (keyInput.current) keyInput.current.focus(); };
