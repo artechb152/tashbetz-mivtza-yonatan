@@ -206,7 +206,7 @@
           const top = Math.min(r1.top, r2.top);
           const left = Math.min(r1.left, r2.left);
           const right = Math.max(r1.right, r2.right);
-          window.scrollBy({ top: top - 120, behavior: "smooth" });
+          window.scrollBy({ top: top - 100, behavior: "smooth" });
           const wrap = boardWrapRef.current;
           if (wrap) {
             const wr = wrap.getBoundingClientRect();
@@ -218,22 +218,30 @@
 
       const focusKbd = () => { if (keyInput.current) keyInput.current.focus(); };
 
+      const fitCellFor = (w) => {
+        if (typeof window === "undefined") return 34;
+        const N = w.keys.length;
+        const fit = w.dir === "across"
+          ? (window.innerWidth - 30) / N
+          : (window.innerHeight * 0.38) / N;
+        return Math.max(15, Math.min(Math.round(fit), 46));
+      };
+
       const selectCell = (k) => {
         const cell = grid[k];
         if (!cell) return;
-        setCellPx((c) => (c < 28 ? 38 : c));
-        setActive((a) => {
-          let dir;
-          if (a && a.key === k && cell.across != null && cell.down != null)
-            dir = a.dir === "across" ? "down" : "across";
-          else
-            dir = cell.across != null ? "across" : "down";
-          return { key: k, dir };
-        });
+        let dir;
+        if (active && active.key === k && cell.across != null && cell.down != null)
+          dir = active.dir === "across" ? "down" : "across";
+        else
+          dir = cell.across != null ? "across" : "down";
+        const wid = cell[dir];
+        if (wid != null) setCellPx(fitCellFor(words[wid]));
+        setActive({ key: k, dir });
         focusKbd();
       };
 
-      const selectClue = (w) => { setCellPx((c) => (c < 28 ? 38 : c)); setActive({ key: w.keys[0], dir: w.dir }); focusKbd(); };
+      const selectClue = (w) => { setCellPx(fitCellFor(w)); setActive({ key: w.keys[0], dir: w.dir }); focusKbd(); };
 
       const stepInWord = (k, dir, delta) => {
         const cell = grid[k];
