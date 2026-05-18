@@ -181,6 +181,7 @@
       });
       const keyInput = useRef(null);
       const cellRefs = useRef({});
+      const boardWrapRef = useRef(null);
 
       const orderedWords = useMemo(() => [...words].sort((a, b) => a.n - b.n), [words]);
 
@@ -194,15 +195,26 @@
       }, [active, grid, words]);
 
       useEffect(() => {
-        if (!active) return;
-        const cell = grid[active.key];
-        if (!cell) return;
-        const id = cell[active.dir];
-        const w = id != null ? words[id] : null;
-        const target = w ? w.keys[Math.floor(w.keys.length / 2)] : active.key;
-        const el = cellRefs.current[target];
-        if (el) el.scrollIntoView({ block: "center", inline: "center", behavior: "smooth" });
-      }, [active, cellPx]);
+        if (!activeWord) return;
+        const w = activeWord;
+        const t = setTimeout(() => {
+          const f = cellRefs.current[w.keys[0]];
+          const l = cellRefs.current[w.keys[w.keys.length - 1]];
+          if (!f || !l) return;
+          const r1 = f.getBoundingClientRect();
+          const r2 = l.getBoundingClientRect();
+          const top = Math.min(r1.top, r2.top);
+          const left = Math.min(r1.left, r2.left);
+          const right = Math.max(r1.right, r2.right);
+          window.scrollBy({ top: top - 120, behavior: "smooth" });
+          const wrap = boardWrapRef.current;
+          if (wrap) {
+            const wr = wrap.getBoundingClientRect();
+            wrap.scrollBy({ left: (left + right) / 2 - (wr.left + wr.width / 2), behavior: "smooth" });
+          }
+        }, 400);
+        return () => clearTimeout(t);
+      }, [activeWord, cellPx]);
 
       const focusKbd = () => { if (keyInput.current) keyInput.current.focus(); };
 
@@ -346,7 +358,7 @@
           </div>
 
           <div className="cw-layout">
-            <div className="cw-board-wrap">
+            <div className="cw-board-wrap" ref={boardWrapRef}>
               <div className="cw-board" style={{
                 gridTemplateColumns: `repeat(${maxC - minC + 1}, var(--cell))`,
                 gridTemplateRows: `repeat(${maxR - minR + 1}, var(--cell))`,
