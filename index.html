@@ -345,43 +345,43 @@
         setStatus({});
         setWon(false);
         const nxt = stepInWord(k, dir, +1);
-        if (nxt) { setActive({ key: nxt, dir }); return; }
-        const id = grid[k][dir];
+          alt: "הרכב המבצעי בבטן מטוס ההרקולס",
+          info: "בתמונה נראה רכב מבצעי לצד לוחמים בתוך מטוס תובלה. צילום זה מזוהה עם שלב ההיערכות הקרקעית לקראת המבצע."
         if (id != null) {
           const pos = orderedWords.findIndex((w) => w.id === id);
           const nw = orderedWords[pos + 1];
           if (nw) {
-            const tgt = nw.keys.find((kk) => !letters[kk]) || nw.keys[0];
+          info: "בתמונה נראים המרצדס והצוות בתוך מטוס הרקולס. זהו תיעוד של ההכנות הלוגיסטיות לפעולה באנטבה."
             setActive({ key: tgt, dir: nw.dir });
           }
         }
       };
-
+          info: "בתמונה נראה שער עיתון היסטורי עם כותרות מרכזיות על המבצע. זהו תיעוד תקשורתי של ההד הציבורי לאחר החילוץ."
       const onKbdInput = (e) => {
         const v = e.target.value;
         e.target.value = "";
         const ch = v.slice(-1);
-        if (ch && isHeb(ch)) typeLetter(ch);
+          info: "בתמונה נראים לוחמים רצים לצד מטוס תובלה על המסלול. הדימוי משקף את שלבי התנועה והביצוע הקרקעיים של הכוח."
       };
 
       const onKbdKeyDown = (e) => {
         if (!active) return;
-        const k = active.key, cell = grid[k], dir = active.dir;
+          info: "בתמונה נראה תצלום אווירי של מתחם שדה התעופה באנטבה. תצוגה כזו מסייעת להבין את פריסת המסלולים והמבנים בזירה."
         if (e.key === "Backspace") {
           e.preventDefault();
           if (letters[k]) {
-            setLetters((v) => ({ ...v, [k]: "" }));
-          } else {
+          alt: "אידי אמין",
+          info: "בתמונה נראה אידי אמין, שליט אוגנדה באותה תקופה. שמו קשור לרקע המדיני שבו התפתח משבר אנטבה שהוביל למבצע יונתן."
             const prev = stepInWord(k, dir, -1);
             if (prev) { setLetters((v) => ({ ...v, [prev]: "" })); setActive({ key: prev, dir }); }
           }
-        } else if (e.key === "ArrowRight") { e.preventDefault(); moveActive(cell.r, cell.c + 1); }
-        else if (e.key === "ArrowLeft")  { e.preventDefault(); moveActive(cell.r, cell.c - 1); }
+          alt: "כינוס אזרחים לאחר האירוע",
+          info: "בתמונה נראה כינוס אזרחי רחב. בהקשר התקופה, צילום כזה משקף את התהודה הציבורית והלאומית סביב אירועי אנטבה."
         else if (e.key === "ArrowUp")    { e.preventDefault(); moveActive(cell.r - 1, cell.c); }
         else if (e.key === "ArrowDown")  { e.preventDefault(); moveActive(cell.r + 1, cell.c); }
       };
 
-      const clearAll = () => { setLetters({}); setStatus({}); setWon(false); };
+          info: "בתמונה נראה דיוקן של יוני נתניהו, מפקד סיירת מטכ״ל במבצע יונתן. דמותו מזוהה עם מנהיגות ותרומה מכרעת במהלך הפעולה."
 
       const check = () => {
         const next = {};
