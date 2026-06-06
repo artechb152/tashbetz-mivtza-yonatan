@@ -450,15 +450,15 @@
       return (
         <div className="cw-root" dir="rtl" style={{ "--cell": cellPx + "px" }}>
           <header className="cw-header">
-            <h1>תשחץ מורשת מיוחד</h1>
-            <div className="cw-sub">מבצע יונתן</div>
+            <h1>תשחץ מבצע יונתן</h1>
+            <div className="cw-sub">תדריך קצר לפני ההמראה</div>
           </header>
 
           <div className="cw-bar">
             <div className="cw-progress">
               <div className="cw-progress-fill" style={{ width: `${(solvedWords / words.length) * 100}%` }} />
             </div>
-            <span className="cw-progress-txt">{solvedWords}/{words.length} הגדרות הושלמו</span>
+            <span className="cw-progress-txt">{solvedWords}/{words.length} מילים שהושלמו</span>
           </div>
 
           <section className="cw-gallery" aria-label="תמונות ארכיון">
@@ -520,7 +520,7 @@
                   autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} />
               </div>
             </div>
-            <div className="cw-clues">
+            <div className="cw-clues" aria-label="רמזים">
               <ClueList title="מאוזן" items={acrossClues} active={activeWord} onPick={selectClue} isSolved={isSolved} />
               <ClueList title="מאונך" items={downClues} active={activeWord} onPick={selectClue} isSolved={isSolved} />
             </div>
@@ -534,9 +534,8 @@
           {won && (
             <div className="cw-win" onClick={() => setWon(false)}>
               <div className="cw-win-card">
-                <div className="cw-win-emoji">🎉</div>
-                <h2>כל הכבוד!</h2>
-                <p>פתרתם את כל התשחץ נכון.</p>
+                <h2>המשימה הושלמה</h2>
+                <p>פתרת את תשחץ מבצע יונתן.</p>
                 <button className="cw-btn cw-btn-primary" onClick={() => setWon(false)}>סגירה</button>
               </div>
             </div>
