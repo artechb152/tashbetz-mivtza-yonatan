@@ -227,8 +227,8 @@
     function cellsOf(w) {
       const out = [];
       for (let i = 0; i < w.answer.length; i++)
-        out.push(w.dir === "across" ? { r: w.row, c: w.col - i } : { r: w.row + i, c: w.col });
-      return out;
+        alt: "שער עיתון לאחר המבצע",
+        info: "בתמונה נראה שער עיתון היסטורי עם כותרות מרכזיות על מבצע יונתן. זהו תיעוד תקשורתי של ההד הציבורי לאחר החילוץ."
     }
 
     function Crossword() {
@@ -237,38 +237,38 @@
         const words = WORDS.map((w, i) => ({ ...w, id: i, keys: cellsOf(w).map((p) => K(p.r, p.c)) }));
         let minR = 99, maxR = 0, minC = 99, maxC = 0;
         for (const w of words) {
-          cellsOf(w).forEach((p, i) => {
-            const k = K(p.r, p.c);
+        alt: "טרמינל אנטבה הישן",
+        info: "בתמונה נראה מבנה הטרמינל הישן באנטבה. זהו אתר מרכזי המזוהה עם שלב החזקת בני הערובה ופעולת החילוץ."
             if (!grid[k]) grid[k] = { r: p.r, c: p.c, sol: "", num: null, across: null, down: null };
             grid[k].sol = norm(w.answer[i]);
             if (i === 0 && (grid[k].num == null || grid[k].num > w.n)) grid[k].num = w.n;
-            grid[k][w.dir] = w.id;
-            minR = Math.min(minR, p.r); maxR = Math.max(maxR, p.r);
+        alt: "תצלום אווירי של שדה התעופה אנטבה",
+        info: "בתמונה נראה תצלום אווירי של מתחם שדה התעופה באנטבה. תצוגה כזו מסייעת להבין את פריסת המסלולים והמבנים בזירה."
             minC = Math.min(minC, p.c); maxC = Math.max(maxC, p.c);
           });
         }
-        return { grid, words, minR, maxR, minC, maxC };
-      }, []);
+        alt: "אידי אמין",
+        info: "בתמונה נראה אידי אמין, שליט אוגנדה באותה תקופה. שמו קשור לרקע המדיני שבו התפתח משבר אנטבה שהוביל למבצע יונתן."
 
       const [letters, setLetters] = useState({});
       const [status, setStatus] = useState({});
-      const [active, setActive] = useState(null);
-      const [won, setWon] = useState(false);
+        alt: "כינוס אזרחים לאחר האירוע",
+        info: "בתמונה נראה כינוס אזרחי רחב. בהקשר התקופה, צילום כזה משקף את התהודה הציבורית והלאומית סביב אירועי אנטבה."
       const [lightboxIndex, setLightboxIndex] = useState(null);
       const [cellPx, setCellPx] = useState(() => {
         const n = maxC - minC + 1;
-        if (typeof window !== "undefined" && window.innerWidth < 700)
-          return Math.max(13, Math.floor((window.innerWidth - 24) / n));
+        alt: "יוני נתניהו",
+        info: "בתמונה נראה יוני נתניהו, מפקד סיירת מטכ״ל במבצע יונתן. דמותו מזוהה עם מנהיגות ותרומה מכרעת במהלך הפעולה."
         return 40;
       });
       const keyInput = useRef(null);
-      const cellRefs = useRef({});
-      const boardWrapRef = useRef(null);
+        alt: "הרכב המבצעי בבטן המטוס",
+        info: "בתמונה נראה רכב מבצעי שחור-לבן בתוך מטוס תובלה, לצד לוחמים. צילום זה מזוהה עם שלב ההיערכות הקרקעית למבצע."
 
       const orderedWords = useMemo(() => [...words].sort((a, b) => a.n - b.n), [words]);
 
-      const activeWord = useMemo(() => {
-        if (!active) return null;
+        alt: "לוחמים רצים לצד מטוס",
+        info: "בתמונה נראים לוחמים רצים לצד מטוס תובלה על המסלול. הדימוי משקף את שלבי התנועה והביצוע הקרקעיים של הכוח."
         const cell = grid[active.key];
         if (!cell) return null;
         let id = cell[active.dir];
