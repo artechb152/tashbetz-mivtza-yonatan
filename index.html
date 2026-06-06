@@ -58,9 +58,9 @@
       border-top:2px solid #d5dfc5;background:#f5f1df;}
     .cw-photo-title{display:block;font-size:12.5px;font-weight:900;color:#1f3520;margin-bottom:4px;}
     .cw-photo-info{display:block;font-size:11.5px;font-weight:700;color:#334d34;line-height:1.45;min-height:44px;}
-    .cw-photo-actions{display:flex;gap:6px;margin-top:7px;}
-    .cw-photo-link{display:inline-block;padding:4px 8px;border-radius:8px;border:1.5px solid #7c2d12;
-      background:#fff5e8;color:#7c2d12;font-size:11px;font-weight:900;text-decoration:none;}
+    .cw-photo-inline{margin-top:8px;border:1.5px solid #7c2d12;border-radius:8px;overflow:hidden;background:#fff;
+      box-shadow:0 2px 6px rgba(0,0,0,.14);}
+    .cw-photo-inline img{display:block;width:100%;height:64px;object-fit:cover;}
     .cw-photo-fallback{height:98px;display:flex;align-items:center;justify-content:center;text-align:center;
       padding:6px;font-size:11px;font-weight:800;color:#7c2d12;background:linear-gradient(135deg,#ffe4bf,#f6c77e);}
     .cw-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px;}
@@ -176,38 +176,32 @@
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/4/49/C-130_Hercules_Landing.jpg",
         alt: "מטוס הרקולס",
-        info: "מטוסי C-130 של חיל האוויר ביצעו את ההגעה והחילוץ באנטבה במסלול לילה ארוך ומדויק.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=%D7%9E%D7%91%D7%A6%D7%A2+%D7%99%D7%95%D7%A0%D7%AA%D7%9F+%D7%94%D7%A8%D7%A7%D7%95%D7%9C%D7%A1"
+        info: "מטוסי C-130 של חיל האוויר ביצעו את ההגעה והחילוץ באנטבה במסלול לילה ארוך ומדויק."
       },
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/7/79/Idi_Amin.jpg",
         alt: "אידי אמין",
-        info: "אוגנדה תחת אידי אמין סיפקה לחוטפים חסות בשדה התעופה באנטבה במהלך המשבר.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=%D7%90%D7%99%D7%93%D7%99+%D7%90%D7%9E%D7%99%D7%9F+%D7%90%D7%A0%D7%98%D7%91%D7%94"
+        info: "אוגנדה תחת אידי אמין סיפקה לחוטפים חסות בשדה התעופה באנטבה במהלך המשבר."
       },
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/3/30/Lockheed_C-130_Hercules.jpg",
         alt: "ההרקולס בזירת מבצעים",
-        info: "ההרקולס אפשר נשיאת כוח גדול, ציוד ורכבים, והיה מפתח ביכולת לבצע חילוץ רחוק ומהיר.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=C-130+Operation+Entebbe"
+        info: "ההרקולס אפשר נשיאת כוח גדול, ציוד ורכבים, והיה מפתח ביכולת לבצע חילוץ רחוק ומהיר."
       },
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Entebbe_International_Airport.jpg",
         alt: "שדה התעופה אנטבה",
-        info: "היעד המבצעי היה הטרמינל הישן באנטבה, שבו הוחזקו בני הערובה עד הגעת כוח החילוץ.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=%D7%A9%D7%93%D7%94+%D7%94%D7%AA%D7%A2%D7%95%D7%A4%D7%94+%D7%90%D7%A0%D7%98%D7%91%D7%94+%D7%94%D7%98%D7%A8%D7%9E%D7%99%D7%A0%D7%9C+%D7%94%D7%99%D7%A9%D7%9F"
+        info: "היעד המבצעי היה הטרמינל הישן באנטבה, שבו הוחזקו בני הערובה עד הגעת כוח החילוץ."
       },
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/5/52/Lockheed_C-130_Hercules%2C_Israeli_Air_Force%2C_2008.jpg",
         alt: "מטוסי תובלה של חיל האוויר",
-        info: "טיסת עומק לאוגנדה דרשה תיאום מודיעיני, תדלוק, ניווט לילי ומשמעת ביצוע גבוהה.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=%D7%9E%D7%91%D7%A6%D7%A2+%D7%90%D7%A0%D7%98%D7%91%D7%94+%D7%97%D7%99%D7%9C+%D7%94%D7%90%D7%95%D7%95%D7%99%D7%A8"
+        info: "טיסת עומק לאוגנדה דרשה תיאום מודיעיני, תדלוק, ניווט לילי ומשמעת ביצוע גבוהה."
       },
       {
         src: "https://upload.wikimedia.org/wikipedia/commons/8/89/Bundesarchiv_Bild_101I-646-5188-17%2C_Lockheed_C-130_Hercules.jpg",
         alt: "הגעה בנחיתה מבצעית",
-        info: "כוח החילוץ ירד במהירות מהמטוסים, פעל בטרמינל והחזיר את מרבית בני הערובה לישראל.",
-        searchUrl: "https://www.google.com/search?tbm=isch&q=%D7%9E%D7%91%D7%A6%D7%A2+%D7%99%D7%95%D7%A0%D7%AA%D7%9F+%D7%A6%D7%99%D7%9C%D7%95%D7%9E%D7%99%D7%9D+%D7%94%D7%99%D7%A1%D7%98%D7%95%D7%A8%D7%99%D7%99%D7%9D"
+        info: "כוח החילוץ ירד במהירות מהמטוסים, פעל בטרמינל והחזיר את מרבית בני הערובה לישראל."
       },
     ];
     function cellsOf(w) {
@@ -465,8 +459,8 @@
                 <figcaption>
                   <span className="cw-photo-title">{item.alt}</span>
                   <span className="cw-photo-info">{item.info}</span>
-                  <span className="cw-photo-actions">
-                    <a className="cw-photo-link" href={item.searchUrl} target="_blank" rel="noopener noreferrer">חיפוש תמונות</a>
+                  <span className="cw-photo-inline">
+                    <img src={item.src} alt={item.alt} />
                   </span>
                 </figcaption>
               </figure>
