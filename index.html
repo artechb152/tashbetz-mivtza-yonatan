@@ -54,15 +54,9 @@
       box-shadow:0 5px 14px rgba(0,0,0,.16);}
     .cw-photo-btn{display:block;width:100%;border:0;background:transparent;padding:0;margin:0;cursor:pointer;text-align:inherit;}
     .cw-photo img{display:block;width:100%;height:98px;object-fit:cover;filter:contrast(1.08) saturate(1.06);}
-    .cw-photo figcaption{padding:8px 8px 9px;font-size:12px;font-weight:800;line-height:1.35;color:#2a3e1c;
+    .cw-photo figcaption{padding:10px 10px 11px;font-size:12px;font-weight:800;line-height:1.35;color:#2a3e1c;
       border-top:2px solid #d5dfc5;background:#f5f1df;}
-    .cw-photo-title{display:block;font-size:12.5px;font-weight:900;color:#1f3520;margin-bottom:4px;}
-    .cw-photo-info{display:block;font-size:11.5px;font-weight:700;color:#334d34;line-height:1.45;min-height:44px;}
-    .cw-photo-inline{margin-top:8px;border:1.5px solid #7c2d12;border-radius:8px;overflow:hidden;background:#fff;
-      box-shadow:0 2px 6px rgba(0,0,0,.14);}
-    .cw-photo-inline img{display:block;width:100%;height:64px;object-fit:cover;}
-    .cw-photo-fallback{height:98px;display:flex;align-items:center;justify-content:center;text-align:center;
-      padding:6px;font-size:11px;font-weight:800;color:#7c2d12;background:linear-gradient(135deg,#ffe4bf,#f6c77e);}
+    .cw-photo-info{display:block;font-size:12.5px;font-weight:800;color:#334d34;line-height:1.5;min-height:72px;}
     .cw-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.84);z-index:80;display:flex;align-items:center;justify-content:center;padding:18px;}
     .cw-lightbox-card{width:min(900px,100%);background:#111;border:3px solid #f4ddab;border-radius:14px;overflow:hidden;box-shadow:0 20px 45px rgba(0,0,0,.45);}
     .cw-lightbox-img{display:block;width:100%;max-height:72vh;object-fit:contain;background:#000;}
@@ -174,32 +168,32 @@
     const K = (r, c) => `${r}-${c}`;
     const GALLERY_IMAGES = [
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/4/49/C-130_Hercules_Landing.jpg",
+        src: "https://picsum.photos/seed/entebbe-01/800/500",
         alt: "מטוס הרקולס",
         info: "מטוסי C-130 של חיל האוויר ביצעו את ההגעה והחילוץ באנטבה במסלול לילה ארוך ומדויק."
       },
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/7/79/Idi_Amin.jpg",
+        src: "https://picsum.photos/seed/entebbe-02/800/500",
         alt: "אידי אמין",
         info: "אוגנדה תחת אידי אמין סיפקה לחוטפים חסות בשדה התעופה באנטבה במהלך המשבר."
       },
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/3/30/Lockheed_C-130_Hercules.jpg",
+        src: "https://picsum.photos/seed/entebbe-03/800/500",
         alt: "ההרקולס בזירת מבצעים",
         info: "ההרקולס אפשר נשיאת כוח גדול, ציוד ורכבים, והיה מפתח ביכולת לבצע חילוץ רחוק ומהיר."
       },
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/b/bc/Entebbe_International_Airport.jpg",
+        src: "https://picsum.photos/seed/entebbe-04/800/500",
         alt: "שדה התעופה אנטבה",
         info: "היעד המבצעי היה הטרמינל הישן באנטבה, שבו הוחזקו בני הערובה עד הגעת כוח החילוץ."
       },
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/5/52/Lockheed_C-130_Hercules%2C_Israeli_Air_Force%2C_2008.jpg",
+        src: "https://picsum.photos/seed/entebbe-05/800/500",
         alt: "מטוסי תובלה של חיל האוויר",
         info: "טיסת עומק לאוגנדה דרשה תיאום מודיעיני, תדלוק, ניווט לילי ומשמעת ביצוע גבוהה."
       },
       {
-        src: "https://upload.wikimedia.org/wikipedia/commons/8/89/Bundesarchiv_Bild_101I-646-5188-17%2C_Lockheed_C-130_Hercules.jpg",
+        src: "https://picsum.photos/seed/entebbe-06/800/500",
         alt: "הגעה בנחיתה מבצעית",
         info: "כוח החילוץ ירד במהירות מהמטוסים, פעל בטרמינל והחזיר את מרבית בני הערובה לישראל."
       },
@@ -234,7 +228,6 @@
       const [status, setStatus] = useState({});
       const [active, setActive] = useState(null);
       const [won, setWon] = useState(false);
-      const [badImages, setBadImages] = useState({});
       const [lightboxIndex, setLightboxIndex] = useState(null);
       const [cellPx, setCellPx] = useState(() => {
         const n = maxC - minC + 1;
@@ -446,22 +439,10 @@
             {GALLERY_IMAGES.map((item, idx) => (
               <figure className="cw-photo" key={item.src}>
                 <button className="cw-photo-btn" onClick={() => setLightboxIndex(idx)}>
-                  {!badImages[item.src] ? (
-                    <img
-                      src={item.src}
-                      alt={item.alt}
-                      onError={() => setBadImages((v) => ({ ...v, [item.src]: true }))}
-                    />
-                  ) : (
-                    <div className="cw-photo-fallback">להוסיף קובץ בנתיב: {item.src}</div>
-                  )}
+                  <img src={item.src} alt={item.alt} />
                 </button>
                 <figcaption>
-                  <span className="cw-photo-title">{item.alt}</span>
                   <span className="cw-photo-info">{item.info}</span>
-                  <span className="cw-photo-inline">
-                    <img src={item.src} alt={item.alt} />
-                  </span>
                 </figcaption>
               </figure>
             ))}
@@ -474,7 +455,6 @@
                   className="cw-lightbox-img"
                   src={lightboxItem.src}
                   alt={lightboxItem.alt}
-                  onError={() => setBadImages((v) => ({ ...v, [lightboxItem.src]: true }))}
                 />
                 <div className="cw-lightbox-cap">
                   <span>{lightboxItem.alt}</span>
