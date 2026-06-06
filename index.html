@@ -461,15 +461,6 @@
             <span className="cw-progress-txt">{solvedWords}/{words.length} הגדרות הושלמו</span>
           </div>
 
-          <div className={"cw-banner" + (activeWord ? "" : " cw-banner-empty")} aria-live="polite">
-            {activeWord ? (
-              <React.Fragment>
-                <span className="cw-banner-tag">{activeWord.n} {activeWord.dir === "across" ? "מאוזן" : "מאונך"}</span>
-                <span className="cw-banner-clue">{activeWord.clue}</span>
-              </React.Fragment>
-            ) : "הקישו על משבצת או על הגדרה כדי להתחיל"}
-          </div>
-
           <section className="cw-gallery" aria-label="תמונות ארכיון">
             {GALLERY_IMAGES.map((item, idx) => (
               <figure className="cw-photo" key={item.src}>
@@ -483,6 +474,15 @@
               </figure>
             ))}
           </section>
+
+          <div className={"cw-banner" + (activeWord ? "" : " cw-banner-empty")} aria-live="polite">
+            {activeWord ? (
+              <React.Fragment>
+                <span className="cw-banner-tag">{activeWord.n} {activeWord.dir === "across" ? "מאוזן" : "מאונך"}</span>
+                <span className="cw-banner-clue">{activeWord.clue}</span>
+              </React.Fragment>
+            ) : "הקישו על משבצת או על הגדרה כדי להתחיל"}
+          </div>
 
           {lightboxItem && (
             <div className="cw-lightbox" onClick={() => setLightboxIndex(null)}>
