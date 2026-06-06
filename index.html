@@ -27,7 +27,7 @@
         radial-gradient(circle at 14% 10%, rgba(255,255,255,.2), transparent 32%),
         radial-gradient(circle at 82% 8%, rgba(255,255,255,.14), transparent 30%),
         linear-gradient(145deg,#3f5e2a 0%,#6e8447 24%,#b08a4d 65%,#76381f 100%);
-      min-height:100vh;padding:20px 10px 44px;box-sizing:border-box;}
+      min-height:100vh;padding:20px 10px max(44px, env(safe-area-inset-bottom));box-sizing:border-box;}
     .cw-kbd{width:100%;height:100%;box-sizing:border-box;border:0;outline:0;margin:0;
       padding:0;background:transparent;color:transparent;caret-color:transparent;
       font-size:16px;text-align:center;pointer-events:none;z-index:3;}
@@ -89,6 +89,8 @@
     .cw-clue-col ul{list-style:none;margin:0;padding:0;}
     .cw-clue{display:flex;gap:9px;align-items:flex-start;padding:8px 10px;border-radius:10px;
       cursor:pointer;font-size:14.8px;line-height:1.45;transition:background .12s ease;font-weight:700;}
+    .cw-clue-btn{display:flex;gap:9px;align-items:flex-start;width:100%;border:0;background:transparent;
+      text-align:right;font:inherit;color:inherit;cursor:pointer;padding:0;}
     .cw-clue:hover{background:#f2edd6;}
     .cw-clue-on{background:#ffe3bf;box-shadow:inset 0 0 0 2px var(--accent);}
     .cw-clue-done .cw-clue-t{color:#16a34a;text-decoration:line-through;}
@@ -110,6 +112,9 @@
       background:#fff7eb;color:#7c2d12;font-size:17px;font-weight:900;
       font-family:inherit;cursor:pointer;line-height:1;padding:0;
       display:flex;align-items:center;justify-content:center;}
+    .cw-cell:focus-visible,.cw-clue-btn:focus-visible,.cw-btn:focus-visible,.cw-zoombtn:focus-visible,.cw-mini-btn:focus-visible,.cw-photo-btn:focus-visible{
+      outline:3px solid #f6ce67;outline-offset:2px;
+    }
     .cw-zoombtn:active{transform:scale(.9);}
     .cw-win{position:fixed;inset:0;background:rgba(15,23,42,.55);display:flex;
       align-items:center;justify-content:center;z-index:50;padding:16px;animation:cwFade .2s ease;}
@@ -120,11 +125,16 @@
     .cw-win-card p{margin:0 0 18px;color:#475569;}
     @keyframes cwFade{from{opacity:0}to{opacity:1}}
     @keyframes cwPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+    @media (prefers-reduced-motion: reduce){
+      .cw-progress-fill,.cw-cell,.cw-clue,.cw-btn,.cw-zoombtn,.cw-win,.cw-win-card{transition:none !important;animation:none !important;}
+    }
     @media(max-width:600px){.cw-root{padding:14px 6px 30px;}
       .cw-header{margin-bottom:10px;}
       .cw-banner{margin-bottom:10px;padding:10px 12px;}
+      .cw-layout{order:1;}
+      .cw-gallery{order:2;}
       .cw-gallery{grid-template-columns:repeat(2,minmax(0,1fr));}
-      .cw-photo img,.cw-photo-fallback{height:84px;}
+      .cw-photo img{height:84px;}
       .cw-lightbox-cap{flex-direction:column;align-items:flex-start;}
       .cw-board-wrap{padding:6px;border-radius:12px;}
       .cw-layout{gap:14px;}
@@ -415,12 +425,21 @@
           const st = status[k];
           const isActive = active && active.key === k;
           cells.push(
-            <div key={k}
+              <div key={k}
               ref={(el) => (cellRefs.current[k] = el)}
               className={"cw-cell" + (activeKeys.has(k) ? " cw-inword" : "") +
                 (isActive ? " cw-active" : "") + (st === "ok" ? " cw-ok" : "") + (st === "bad" ? " cw-bad" : "")}
               style={{ gridColumn: c - minC + 1, gridRow: r - minR + 1 }}
-              onClick={() => selectCell(k)}>
+                onClick={() => selectCell(k)}
+                role="button"
+                tabIndex={0}
+                aria-label={`שורה ${cell.r + 1}, עמודה ${cell.c + 1}, ${cell.num != null ? `הגדרה ${cell.num}, ` : ""}${letters[k] ? `אות ${letters[k]}` : "תא ריק"}`}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    selectCell(k);
+                  }
+                }}>
               {cell.num != null && <span className="cw-num">{cell.num}</span>}
               <span className="cw-letter">{letters[k] || ""}</span>
             </div>
@@ -442,7 +461,7 @@
             <span className="cw-progress-txt">{solvedWords}/{words.length} הגדרות הושלמו</span>
           </div>
 
-          <div className={"cw-banner" + (activeWord ? "" : " cw-banner-empty")}>
+          <div className={"cw-banner" + (activeWord ? "" : " cw-banner-empty")} aria-live="polite">
             {activeWord ? (
               <React.Fragment>
                 <span className="cw-banner-tag">{activeWord.n} {activeWord.dir === "across" ? "מאוזן" : "מאונך"}</span>
@@ -454,7 +473,7 @@
           <section className="cw-gallery" aria-label="תמונות ארכיון">
             {GALLERY_IMAGES.map((item, idx) => (
               <figure className="cw-photo" key={item.src}>
-                <button className="cw-photo-btn" onClick={() => setLightboxIndex(idx)}>
+                <button className="cw-photo-btn" aria-label={`פתח תמונה: ${item.alt}`} onClick={() => setLightboxIndex(idx)}>
                   <img src={item.src} alt={item.alt} />
                 </button>
                 <figcaption>
@@ -497,6 +516,7 @@
                     ? { gridColumn: grid[active.key].c - minC + 1, gridRow: grid[active.key].r - minR + 1 }
                     : { gridColumn: 1, gridRow: 1 }}
                   onChange={onKbdInput} onKeyDown={onKbdKeyDown} inputMode="text"
+                  aria-label="קלט אות לתשחץ"
                   autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} />
               </div>
             </div>
@@ -541,10 +561,15 @@
               const on = active && active.n === w.n && active.dir === w.dir;
               return (
                 <li key={w.dir + w.n}
-                  className={"cw-clue" + (on ? " cw-clue-on" : "") + (isSolved(w) ? " cw-clue-done" : "")}
-                  onClick={() => onPick(w)}>
-                  <span className="cw-clue-n">{w.n}</span>
-                  <span className="cw-clue-t">{w.clue}</span>
+                  className={"cw-clue" + (on ? " cw-clue-on" : "") + (isSolved(w) ? " cw-clue-done" : "")}>
+                  <button
+                    type="button"
+                    className="cw-clue-btn"
+                    aria-label={`הגדרה ${w.n}, ${w.dir === "across" ? "מאוזן" : "מאונך"}. ${w.clue}`}
+                    onClick={() => onPick(w)}>
+                    <span className="cw-clue-n">{w.n}</span>
+                    <span className="cw-clue-t">{w.clue}</span>
+                  </button>
                 </li>
               );
             })}
