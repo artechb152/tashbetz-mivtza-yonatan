@@ -345,43 +345,43 @@
         setStatus({});
         setWon(false);
         const nxt = stepInWord(k, dir, +1);
-          alt: "הרכב המבצעי בבטן מטוס ההרקולס",
-          info: "בתמונה נראה רכב מבצעי לצד לוחמים בתוך מטוס תובלה. צילום זה מזוהה עם שלב ההיערכות הקרקעית לקראת המבצע."
+        if (nxt) { setActive({ key: nxt, dir }); return; }
+        const id = grid[k][dir];
         if (id != null) {
           const pos = orderedWords.findIndex((w) => w.id === id);
           const nw = orderedWords[pos + 1];
           if (nw) {
-          info: "בתמונה נראים המרצדס והצוות בתוך מטוס הרקולס. זהו תיעוד של ההכנות הלוגיסטיות לפעולה באנטבה."
+            const tgt = nw.keys.find((kk) => !letters[kk]) || nw.keys[0];
             setActive({ key: tgt, dir: nw.dir });
           }
         }
       };
-          info: "בתמונה נראה שער עיתון היסטורי עם כותרות מרכזיות על המבצע. זהו תיעוד תקשורתי של ההד הציבורי לאחר החילוץ."
+
       const onKbdInput = (e) => {
         const v = e.target.value;
         e.target.value = "";
         const ch = v.slice(-1);
-          info: "בתמונה נראים לוחמים רצים לצד מטוס תובלה על המסלול. הדימוי משקף את שלבי התנועה והביצוע הקרקעיים של הכוח."
+        if (ch && isHeb(ch)) typeLetter(ch);
       };
 
       const onKbdKeyDown = (e) => {
         if (!active) return;
-          info: "בתמונה נראה תצלום אווירי של מתחם שדה התעופה באנטבה. תצוגה כזו מסייעת להבין את פריסת המסלולים והמבנים בזירה."
+        const k = active.key, cell = grid[k], dir = active.dir;
         if (e.key === "Backspace") {
           e.preventDefault();
           if (letters[k]) {
-          alt: "אידי אמין",
-          info: "בתמונה נראה אידי אמין, שליט אוגנדה באותה תקופה. שמו קשור לרקע המדיני שבו התפתח משבר אנטבה שהוביל למבצע יונתן."
+            setLetters((v) => ({ ...v, [k]: "" }));
+          } else {
             const prev = stepInWord(k, dir, -1);
             if (prev) { setLetters((v) => ({ ...v, [prev]: "" })); setActive({ key: prev, dir }); }
           }
-          alt: "כינוס אזרחים לאחר האירוע",
-          info: "בתמונה נראה כינוס אזרחי רחב. בהקשר התקופה, צילום כזה משקף את התהודה הציבורית והלאומית סביב אירועי אנטבה."
+        } else if (e.key === "ArrowRight") { e.preventDefault(); moveActive(cell.r, cell.c + 1); }
+        else if (e.key === "ArrowLeft")  { e.preventDefault(); moveActive(cell.r, cell.c - 1); }
         else if (e.key === "ArrowUp")    { e.preventDefault(); moveActive(cell.r - 1, cell.c); }
         else if (e.key === "ArrowDown")  { e.preventDefault(); moveActive(cell.r + 1, cell.c); }
       };
 
-          info: "בתמונה נראה דיוקן של יוני נתניהו, מפקד סיירת מטכ״ל במבצע יונתן. דמותו מזוהה עם מנהיגות ותרומה מכרעת במהלך הפעולה."
+      const clearAll = () => { setLetters({}); setStatus({}); setWon(false); };
 
       const check = () => {
         const next = {};
