@@ -25,14 +25,25 @@
     @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
 
     /* ===== מסך פתיחה (hero) ===== */
-    .cw-hero{position:relative;height:100vh;height:100dvh;width:100%;
+    .cw-hero{position:relative;height:100vh;height:100svh;width:100%;
       scroll-snap-align:start;display:flex;align-items:center;justify-content:center;
       background:#26331b;overflow:hidden;}
-    .cw-hero-img{max-width:100%;max-height:100%;width:auto;height:100%;object-fit:contain;display:block;}
-    /* אזור לחיץ שקוף מעל חץ הגלילה שכבר קיים בתמונת הפתיחה (חץ אחד בלבד) */
-    .cw-scrolldown{position:absolute;left:50%;bottom:0;transform:translateX(-50%);z-index:5;
-      width:min(40vw,220px);height:14%;max-height:150px;padding:0;font-size:0;
-      background:transparent;border:0;cursor:pointer;}
+    /* בנייד: ממלא את כל המסך ללא פסים (יחס התמונה כמעט זהה לטלפון). בדסקטופ: מציג את הכרזה במלואה */
+    .cw-hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
+    .cw-scrolldown{position:absolute;left:50%;bottom:max(16px,env(safe-area-inset-bottom));
+      transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;
+      background:transparent;border:0;cursor:pointer;color:#eafff0;font-family:'Heebo',Arial,sans-serif;
+      font-weight:800;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.75);
+      animation:cwBounce 1.7s ease-in-out infinite;}
+    .cw-chevcircle{display:flex;align-items:center;justify-content:center;width:42px;height:42px;
+      border-radius:50%;background:rgba(59,232,75,.92);color:#0d2b12;box-shadow:0 4px 12px rgba(0,0,0,.55);}
+    .cw-chevcircle svg{width:24px;height:24px;}
+    @keyframes cwBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(7px);}}
+    @media (prefers-reduced-motion: reduce){.cw-scrolldown{animation:none;}}
+    @media (min-width:700px){
+      .cw-hero-img{object-fit:contain;object-position:center;}
+      .cw-scrolldown{display:none;}
+    }
 
     /* ===== שורש התשחץ ===== */
     .sw-root{--ink:#102015;--accent:#2ea043;--neon:#3be84b;--line:#3a5233;
@@ -98,24 +109,26 @@
     .sw-clue.on{box-shadow:inset 0 0 0 2px var(--neon);background:#2a3d20;}
     .sw-clue-photo img{width:100%;height:100%;object-fit:cover;display:block;filter:contrast(1.05) saturate(1.04);}
 
-    /* מספר ההגדרה — קטן, בפינה העליונה */
-    .sw-num{position:absolute;top:1px;right:3px;z-index:2;line-height:1;font-weight:900;color:#eaffe0;
-      font-size:clamp(9px,calc(var(--cell)*0.34),15px);text-shadow:0 1px 2px rgba(0,0,0,.85);}
-    .sw-clue-photo .sw-num{background:rgba(0,0,0,.55);border-radius:4px;padding:0 3px;top:2px;right:2px;}
+    /* מספר ההגדרה — שבב לבן ברור וקריא בפינה העליונה */
+    .sw-num{position:absolute;top:2px;right:2px;z-index:5;line-height:1.05;font-weight:900;
+      color:#123419;background:#eafff0;border:1px solid #2ea043;border-radius:5px;
+      min-width:calc(var(--cell)*0.44);text-align:center;padding:1px 3px;
+      font-size:clamp(10px,calc(var(--cell)*0.4),16px);box-shadow:0 1px 3px rgba(0,0,0,.55);}
+    .sw-clue-photo .sw-num{color:#123419;background:#eafff0;}
 
     /* חץ = הכפתור. עיגול ניאון ברור, בקצה שמצביע אל התשובה */
     .sw-arrow{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;
-      width:clamp(15px,calc(var(--cell)*0.6),24px);height:clamp(15px,calc(var(--cell)*0.6),24px);
-      border-radius:50%;background:var(--neon);color:#0d2b12;border:2px solid #eafff0;
-      box-shadow:0 0 0 2px rgba(59,232,75,.4),0 2px 6px rgba(0,0,0,.55);pointer-events:none;}
-    .sw-arrow svg{width:64%;height:64%;}
-    .sw-clue.across .sw-arrow{left:-1px;bottom:2px;}
+      width:clamp(13px,calc(var(--cell)*0.5),21px);height:clamp(13px,calc(var(--cell)*0.5),21px);
+      border-radius:50%;background:var(--neon);color:#0d2b12;border:1.5px solid #123419;
+      box-shadow:0 1px 4px rgba(0,0,0,.5);pointer-events:none;}
+    .sw-arrow svg{width:68%;height:68%;}
+    .sw-clue.across .sw-arrow{left:1px;bottom:1px;}
     .sw-clue.across .sw-arrow svg{transform:rotate(90deg);}
-    .sw-clue.down .sw-arrow{bottom:-1px;left:2px;}
-    .sw-clue:hover .sw-arrow,.sw-clue.on .sw-arrow{background:#65ff73;}
+    .sw-clue.down .sw-arrow{bottom:1px;left:1px;}
+    .sw-clue:hover .sw-arrow,.sw-clue.on .sw-arrow{background:#65ff73;box-shadow:0 0 0 2px rgba(59,232,75,.55),0 1px 4px rgba(0,0,0,.5);}
 
     /* כפתור מידע על התמונה */
-    .sw-info{position:absolute;bottom:2px;right:2px;z-index:4;padding:0;cursor:pointer;
+    .sw-info{position:absolute;bottom:2px;right:2px;z-index:6;padding:0;cursor:pointer;
       width:clamp(14px,calc(var(--cell)*0.4),20px);height:clamp(14px,calc(var(--cell)*0.4),20px);
       border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:1.5px solid rgba(255,255,255,.85);
       font-family:Georgia,serif;font-style:italic;font-weight:700;line-height:1;
@@ -477,7 +490,10 @@
               alt="תשחץ מבצע יונתן בסימן 50 שנה — מורשת אמ״ן"
               onError={(e) => { e.target.style.display = "none"; }} />
             <button className="cw-scrolldown" type="button" aria-label="גלול מטה לתשחץ"
-              onClick={() => document.getElementById("puzzle").scrollIntoView({ behavior: "smooth" })}></button>
+              onClick={() => document.getElementById("puzzle").scrollIntoView({ behavior: "smooth" })}>
+              <span className="cw-chevcircle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg></span>
+              <span>לתשחץ</span>
+            </button>
           </section>
 
           <div id="puzzle" className="sw-root" dir="rtl" style={{ "--cell": cellPx + "px" }}>
