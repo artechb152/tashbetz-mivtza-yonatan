@@ -28,22 +28,14 @@
     .cw-hero{position:relative;height:100vh;height:100svh;width:100%;
       scroll-snap-align:start;display:flex;align-items:center;justify-content:center;
       background:#26331b;overflow:hidden;}
-    /* בנייד: ממלא את כל המסך ללא פסים (יחס התמונה כמעט זהה לטלפון). בדסקטופ: מציג את הכרזה במלואה */
-    .cw-hero-img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;}
-    .cw-scrolldown{position:absolute;left:50%;bottom:max(16px,env(safe-area-inset-bottom));
-      transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;
-      background:transparent;border:0;cursor:pointer;color:#eafff0;font-family:'Heebo',Arial,sans-serif;
-      font-weight:800;font-size:13px;text-shadow:0 1px 4px rgba(0,0,0,.75);
-      animation:cwBounce 1.7s ease-in-out infinite;}
-    .cw-chevcircle{display:flex;align-items:center;justify-content:center;width:42px;height:42px;
-      border-radius:50%;background:rgba(59,232,75,.92);color:#0d2b12;box-shadow:0 4px 12px rgba(0,0,0,.55);}
-    .cw-chevcircle svg{width:24px;height:24px;}
-    @keyframes cwBounce{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(7px);}}
-    @media (prefers-reduced-motion: reduce){.cw-scrolldown{animation:none;}}
-    @media (min-width:700px){
-      .cw-hero-img{object-fit:contain;object-position:center;}
-      .cw-scrolldown{display:none;}
-    }
+    /* מילוי מטושטש של אותה תמונה מאחור — כך הכרזה המלאה נראית תמיד (בלי חיתוך), והרקע נראה מכוון (בלי פסים) */
+    .cw-hero::before{content:"";position:absolute;inset:0;z-index:0;
+      background:url("images/hero.jpeg") center center / cover no-repeat;
+      filter:blur(30px) brightness(.5);transform:scale(1.25);}
+    .cw-hero-img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block;}
+    /* אזור לחיץ שקוף מעל חץ הגלילה שכבר קיים בתמונת הפתיחה (חץ אחד בלבד) */
+    .cw-scrolldown{position:absolute;left:0;right:0;bottom:0;z-index:5;width:100%;
+      height:16%;max-height:150px;padding:0;font-size:0;background:transparent;border:0;cursor:pointer;}
 
     /* ===== שורש התשחץ ===== */
     .sw-root{--ink:#102015;--accent:#2ea043;--neon:#3be84b;--line:#3a5233;
@@ -76,8 +68,8 @@
     .sw-banner-tag{background:#dff5e0;color:#1f7a2e;font-weight:900;font-size:13px;
       padding:5px 10px;border-radius:8px;white-space:nowrap;border:1px solid #86d38f;flex:none;}
     .sw-banner-clue{font-size:clamp(15px,4vw,19px);font-weight:800;color:#152d19;line-height:1.3;}
-    .sw-banner-thumb{height:44px;width:44px;object-fit:cover;border-radius:8px;border:2px solid #5f7249;
-      margin-inline-start:auto;flex:none;}
+    .sw-banner-thumb{height:62px;width:62px;object-fit:cover;object-position:center 30%;border-radius:10px;
+      border:2px solid #5f7249;margin-inline-start:auto;flex:none;cursor:pointer;}
 
     /* לוח */
     .sw-wrap{width:fit-content;max-width:calc(100vw - 22px);margin:0 auto;
@@ -134,6 +126,15 @@
       font-family:Georgia,serif;font-style:italic;font-weight:700;line-height:1;
       font-size:clamp(9px,calc(var(--cell)*0.28),13px);display:flex;align-items:center;justify-content:center;}
     .sw-info:hover{background:rgba(0,0,0,.82);}
+    /* על משבצות התמונה — סמנים קטנים כדי לא להסתיר את הפנים */
+    .sw-clue-photo .sw-num{min-width:0;padding:0 2px;border-radius:4px;top:1px;right:1px;
+      font-size:clamp(8px,calc(var(--cell)*0.3),12px);background:rgba(234,255,240,.92);border-color:rgba(46,160,67,.85);}
+    .sw-clue-photo .sw-arrow{border-width:1px;
+      width:clamp(11px,calc(var(--cell)*0.4),17px);height:clamp(11px,calc(var(--cell)*0.4),17px);}
+    .sw-clue-photo .sw-info{border-width:1px;background:rgba(0,0,0,.5);
+      width:clamp(11px,calc(var(--cell)*0.34),16px);height:clamp(11px,calc(var(--cell)*0.34),16px);
+      font-size:clamp(8px,calc(var(--cell)*0.24),11px);}
+    .sw-clue-photo img{object-position:center 30%;}
 
     /* קלט נסתר להקלדה */
     .sw-kbd{position:absolute;border:0;outline:0;margin:0;padding:0;background:transparent;
@@ -490,10 +491,7 @@
               alt="תשחץ מבצע יונתן בסימן 50 שנה — מורשת אמ״ן"
               onError={(e) => { e.target.style.display = "none"; }} />
             <button className="cw-scrolldown" type="button" aria-label="גלול מטה לתשחץ"
-              onClick={() => document.getElementById("puzzle").scrollIntoView({ behavior: "smooth" })}>
-              <span className="cw-chevcircle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg></span>
-              <span>לתשחץ</span>
-            </button>
+              onClick={() => document.getElementById("puzzle").scrollIntoView({ behavior: "smooth" })}></button>
           </section>
 
           <div id="puzzle" className="sw-root" dir="rtl" style={{ "--cell": cellPx + "px" }}>
@@ -515,7 +513,8 @@
                   <span className="sw-banner-tag">{activeWord.n} {dirWord(activeWord.dir)}</span>
                   <span className="sw-banner-clue">{activeWord.clue}</span>
                   {activeWord.photo && (
-                    <img className="sw-banner-thumb" src={IMG_BASE + activeWord.photo + ".jpeg"} alt="" />
+                    <img className="sw-banner-thumb" src={IMG_BASE + activeWord.photo + ".jpeg"} alt="הצג תמונה מלאה"
+                      onClick={() => setLightbox({ url: IMG_BASE + activeWord.photo + ".jpeg", cap: activeWord.clue })} />
                   )}
                 </React.Fragment>
               ) : "הקישו על מספר של הגדרה, על משבצת, או על שורה ברשימה כדי להתחיל"}
