@@ -21,7 +21,8 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     *{box-sizing:border-box;}
-    html,body{margin:0;background:#26331b;overflow-x:hidden;}
+    html,body,#root{width:100%;min-height:100%;margin:0;max-width:none;}
+    body{background:#26331b;overflow-x:hidden;}
     html{scroll-behavior:smooth;}
     @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
 
@@ -239,9 +240,7 @@
       .sw-zoomctl{margin-top:8px;}
       .sw-actions{gap:10px;margin-top:14px;}
       .sw-btn{font-size:14.5px;padding:11px 22px;}
-      /* מובייל: רשימת השאלות המלאה וההסבר הארוך מוסתרים לגמרי — שאלה אחת בכל פעם באזור שמעל הלוח */
-      .sw-clues{display:none;}
-      .sw-hint{display:none;}
+      /* מובייל: רשימת השאלות וההסבר אינם מרונדרים כלל ב-DOM (תנאי React {!isMobile}) — לא צריך display:none */
       .sw-checkmsg{font-size:13.5px;padding:10px 13px;}
     }
     /* מסכים צרים במיוחד (עד 400px) */
@@ -326,7 +325,17 @@
       const [lightbox, setLightbox] = useState(null);
       const [checkMsg, setCheckMsg] = useState(null);
       const [zoom, setZoom] = useState(1);
-      const [view, setView] = useState("hero"); // "hero" | "puzzle" — מסך אחד בכל פעם
+      const [screen, setScreen] = useState("intro"); // "intro" | "game" — שני views נפרדים לחלוטין
+      // זיהוי מובייל אמיתי — כדי לא לרנדר כלל את רשימת השאלות בטלפון (ולא רק display:none)
+      const [isMobile, setIsMobile] = useState(() =>
+        typeof window !== "undefined" && window.matchMedia("(max-width: 600px)").matches);
+      useEffect(() => {
+        const mq = window.matchMedia("(max-width: 600px)");
+        const onChange = () => setIsMobile(mq.matches);
+        onChange();
+        if (mq.addEventListener) mq.addEventListener("change", onChange); else mq.addListener(onChange);
+        return () => { if (mq.removeEventListener) mq.removeEventListener("change", onChange); else mq.removeListener(onChange); };
+      }, []);
 
       const keyInput = useRef(null);
       const cellRefs = useRef({});
@@ -471,6 +480,14 @@
       const wordLen = activeWord ? activeWord.keys.length : 0;
       const wordFilled = activeWord ? activeWord.keys.filter((k) => (letters[k] || "") !== "").length : 0;
       const boardFull = Object.keys(grid).every((k) => (letters[k] || "") !== "");
+      // selectedClue — השאלה הפעילה שמוצגת באזור שמעל הלוח (נגזר ממקור אמת יחיד: activeWord)
+      const selectedClue = activeWord ? {
+        number: activeWord.n,
+        direction: activeWord.dir,
+        text: activeWord.clue,
+        length: wordLen,
+        image: activeWord.photo || null,
+      } : null;
 
       const enterSpace = (fn) => (e) => {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); }
@@ -538,11 +555,11 @@
         </div>
       );
 
-      if (view === "hero") {
+      if (screen === "intro") {
         return (
           <section className="cw-hero" aria-label="מסך פתיחה — תשחץ מבצע יונתן בסימן 50 שנה, מורשת אמ״ן">
             <button className="cw-start" type="button" aria-label="התחילו את התשחץ"
-              onClick={() => { setView("puzzle"); window.scrollTo({ top: 0, behavior: "instant" }); }}>
+              onClick={() => { setScreen("game"); window.scrollTo({ top: 0, behavior: "instant" }); }}>
               <span>התחילו את התשחץ</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
             </button>
@@ -565,18 +582,18 @@
               <span className="sw-progress-txt">{solvedWords}/{words.length} מילים</span>
             </div>
 
-            <div className={"sw-banner" + (activeWord ? "" : " sw-banner-empty")} aria-live="polite">
-              {activeWord ? (
+            <div className={"sw-banner" + (selectedClue ? "" : " sw-banner-empty")} aria-live="polite">
+              {selectedClue ? (
                 <React.Fragment>
-                  <span className="sw-banner-tag">{activeWord.n} {dirWord(activeWord.dir)}</span>
-                  <span className="sw-banner-clue">{activeWord.clue}</span>
-                  {activeWord.photo && (
-                    <img className="sw-banner-thumb" src={IMG_BASE + activeWord.photo + ".jpeg"} alt="הצג תמונה מלאה"
-                      onClick={() => setLightbox({ url: IMG_BASE + activeWord.photo + ".jpeg", cap: activeWord.clue })} />
+                  <span className="sw-banner-tag">{selectedClue.number} {dirWord(selectedClue.direction)}</span>
+                  <span className="sw-banner-clue">{selectedClue.text}</span>
+                  {selectedClue.image && (
+                    <img className="sw-banner-thumb" src={IMG_BASE + selectedClue.image + ".jpeg"} alt="תמונת השאלה"
+                      onClick={() => setLightbox({ url: IMG_BASE + selectedClue.image + ".jpeg", cap: selectedClue.text })} />
                   )}
                   <span className="sw-banner-meta">
-                    <span className="sw-banner-count">{wordFilled}/{wordLen} אותיות</span>
-                    <span className="sw-wordbar"><span className="sw-wordbar-fill" style={{ width: `${wordLen ? (wordFilled / wordLen) * 100 : 0}%` }} /></span>
+                    <span className="sw-banner-count">{wordFilled}/{selectedClue.length} אותיות</span>
+                    <span className="sw-wordbar"><span className="sw-wordbar-fill" style={{ width: `${selectedClue.length ? (wordFilled / selectedClue.length) * 100 : 0}%` }} /></span>
                   </span>
                 </React.Fragment>
               ) : "לחצו על מספר בתשחץ כדי להציג את השאלה"}
@@ -603,10 +620,13 @@
                 onClick={() => setZoom((z) => Math.min(+(z * 1.2).toFixed(3), 2.2))}>+</button>
             </div>
 
-            <div className="sw-clues" aria-label="רשימת הגדרות">
-              <ClueList title="מאוזן" items={acrossClues} />
-              <ClueList title="מאונך" items={downClues} />
-            </div>
+            {/* רשימת ההגדרות — מרונדרת רק בדסקטופ. במובייל היא לא נוצרת ב-DOM כלל (תנאי React, לא CSS). */}
+            {!isMobile && (
+              <div className="sw-clues" aria-label="רשימת הגדרות">
+                <ClueList title="מאוזן" items={acrossClues} />
+                <ClueList title="מאונך" items={downClues} />
+              </div>
+            )}
 
             <div className="sw-actions">
               <button className="sw-btn sw-btn-primary" onClick={check}>{boardFull ? "סיימתי – בדיקת תשובות" : "בדיקת תשובות"}</button>
@@ -620,7 +640,9 @@
               </div>
             )}
 
-            <p className="sw-hint">כל משבצת כהה עם מספר היא הגדרה, והחץ מצביע לכיוון התשובה. בהגדרות המצולמות (📷) — התמונה מוצגת בהגדלה בסרגל שמעל הלוח.</p>
+            {!isMobile && (
+              <p className="sw-hint">כל משבצת כהה עם מספר היא הגדרה, והחץ מצביע לכיוון התשובה. בהגדרות המצולמות — התמונה מוצגת בהגדלה בסרגל שמעל הלוח.</p>
+            )}
           </div>
 
           {lightbox && (
@@ -643,7 +665,7 @@
                 <p>השלמתם את תשחץ מבצע יונתן — כל התשובות נכונות.</p>
                 <div className="sw-win-actions">
                   <button className="sw-btn sw-btn-primary"
-                    onClick={() => { setWon(false); setView("hero"); window.scrollTo(0, 0); }}>למסך הפתיחה</button>
+                    onClick={() => { setWon(false); setScreen("intro"); window.scrollTo(0, 0); }}>למסך הפתיחה</button>
                   <button className="sw-btn sw-btn-ghost" onClick={() => setWon(false)}>המשך לצפייה בלוח</button>
                 </div>
               </div>
