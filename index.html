@@ -25,19 +25,20 @@
     html{scroll-behavior:smooth;}
     @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
 
-    /* ===== מסך פתיחה (hero) — מסך עצמאי שממלא 100% רוחב וגובה, בלי שוליים כהים ===== */
-    .cw-hero{position:relative;width:100%;min-height:100vh;min-height:100dvh;overflow:hidden;background:#26331b;}
-    .cw-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;display:block;}
+    /* ===== מסך פתיחה (hero) — מסך עצמאי שממלא בדיוק את כל מסך הטלפון ===== */
+    .cw-hero{position:relative;width:100vw;min-height:100dvh;height:100dvh;overflow:hidden;margin:0;
+      background:#26331b url("images/hero.jpeg") center center / cover no-repeat;
+      display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+      padding:env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 16px);}
     /* כפתור CTA רחב, ממורכז, פינות מעוגלות, ירוק תואם-פלטה (פחות זרחני) */
-    .cw-start{position:absolute;left:50%;bottom:max(26px,calc(env(safe-area-inset-bottom) + 18px));
-      transform:translateX(-50%);z-index:2;display:inline-flex;align-items:center;justify-content:center;gap:7px;
-      width:min(82vw,320px);min-height:52px;padding:0 20px;border-radius:16px;border:0;cursor:pointer;white-space:nowrap;
+    .cw-start{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+      width:min(88vw,340px);min-height:52px;padding:0 20px;border-radius:16px;border:0;cursor:pointer;white-space:nowrap;
       background:#2ea043;color:#fff;font-family:'Heebo',Arial,sans-serif;font-weight:900;font-size:clamp(15px,4.4vw,18px);
       box-shadow:0 8px 22px rgba(0,0,0,.4);}
-    .cw-start:active{transform:translateX(-50%) scale(.98);}
+    .cw-start:active{transform:scale(.98);}
     .cw-start svg{width:16px;height:16px;flex:none;}
     /* דסקטופ/מסך רחב: הצג את הכרזה במלואה (בלי חיתוך חזק של פורטרייט) */
-    @media(min-width:800px){ .cw-hero-img{object-fit:contain;} }
+    @media(min-width:800px){ .cw-hero{background-size:contain;} }
 
     /* ===== שורש התשחץ ===== */
     .sw-root{--ink:#102015;--accent:#2ea043;--neon:#3be84b;--line:#3a5233;
@@ -117,6 +118,9 @@
       transition:background .12s ease,box-shadow .12s ease;}
     .sw-clue:hover{background:#31461f;}
     .sw-clue.on{box-shadow:inset 0 0 0 2px var(--neon);background:#31461f;}
+    /* נקודה קטנה שמסמנת שההגדרה כוללת תמונה (התמונה עצמה מוצגת בגדול באזור השאלה שמעל הלוח) */
+    .sw-clue.has-photo::after{content:"";position:absolute;top:2px;left:2px;border-radius:50%;
+      width:clamp(4px,1.7cqw,7px);height:clamp(4px,1.7cqw,7px);background:var(--neon);box-shadow:0 0 3px rgba(0,0,0,.6);}
     .sw-clue-photo img{width:100%;height:100%;object-fit:cover;object-position:center 26%;display:block;}
 
     /* מספר ההגדרה — שבב לבן ברור וקריא בפינה העליונה, מעל הכל (לא מכוסה ע"י חץ/תמונה) */
@@ -227,7 +231,7 @@
       .sw-banner{padding:8px 10px;gap:8px;margin-bottom:8px;border-width:2px;flex-wrap:wrap;min-height:0;}
       .sw-banner-tag{font-size:12px;padding:4px 8px;}
       .sw-banner-clue{font-size:15px;flex:1 1 55%;}
-      .sw-banner-thumb{height:60px;}
+      .sw-banner-thumb{height:66px;}
       .sw-banner-meta{gap:3px;}
       .sw-banner-count{font-size:11px;}
       .sw-wordbar{width:60px;height:6px;}
@@ -235,16 +239,15 @@
       .sw-zoomctl{margin-top:8px;}
       .sw-actions{gap:10px;margin-top:14px;}
       .sw-btn{font-size:14.5px;padding:11px 22px;}
-      .sw-clues{padding:12px 14px;gap:10px;margin-top:12px;}
-      .sw-clue-col{min-width:0;flex:1 1 100%;}
-      .sw-clue-txt{font-size:14px;}
-      .sw-hint{font-size:11.5px;margin-top:10px;line-height:1.5;}
+      /* מובייל: רשימת השאלות המלאה וההסבר הארוך מוסתרים לגמרי — שאלה אחת בכל פעם באזור שמעל הלוח */
+      .sw-clues{display:none;}
+      .sw-hint{display:none;}
       .sw-checkmsg{font-size:13.5px;padding:10px 13px;}
     }
     /* מסכים צרים במיוחד (עד 400px) */
     @media(max-width:400px){
       .sw-title h1{font-size:20px;}
-      .sw-banner-thumb{height:52px;}
+      .sw-banner-thumb{height:58px;}
       .sw-banner-clue{font-size:14px;}
       .sw-btn{padding:11px 18px;}
     }
@@ -441,22 +444,22 @@
 
       const check = () => {
         const next = {};
-        let wrong = 0, empty = 0, correct = 0;
+        let wrong = 0, empty = 0;
         for (const key of Object.keys(grid)) {
           const val = letters[key] || "";
           if (!val) { next[key] = "miss"; empty++; }
-          else if (norm(val) === grid[key].sol) { next[key] = "ok"; correct++; }
+          else if (norm(val) === grid[key].sol) { next[key] = "ok"; }
           else { next[key] = "bad"; wrong++; }
         }
         setStatus(next);
+        const solvedCount = words.filter((w) => w.keys.every((k) => norm(letters[k] || "") === grid[k].sol)).length;
         if (wrong === 0 && empty === 0) {
           setWon(true); setCheckMsg(null);
-        } else if (wrong === 0) {
-          setCheckMsg({ kind: "warn", text: `אין טעויות! נותרו ${empty} ${empty === 1 ? "תא למילוי" : "תאים למילוי"} — התשחץ עדיין לא הושלם.` });
         } else {
-          const parts = [`${wrong} ${wrong === 1 ? "אות שגויה (באדום)" : "אותיות שגויות (באדום)"}`];
-          if (empty > 0) parts.push(`${empty} ${empty === 1 ? "תא ריק" : "תאים ריקים"}`);
-          setCheckMsg({ kind: "warn", text: `נמצאו ${parts.join(" ו־")}. התשחץ עדיין לא הושלם.` });
+          let tail = "";
+          if (wrong > 0) tail = ` נותרו ${wrong} ${wrong === 1 ? "אות שגויה" : "אותיות שגויות"} (באדום) לתקן.`;
+          else if (empty > 0) tail = " אין טעויות — השלימו את המשבצות הריקות.";
+          setCheckMsg({ kind: wrong > 0 ? "warn" : "good", text: `${solvedCount} מתוך ${words.length} מילים נכונות.${tail}` });
         }
       };
 
@@ -467,6 +470,7 @@
       const downClues = words.filter((w) => w.dir === "down").sort((a, b) => a.n - b.n);
       const wordLen = activeWord ? activeWord.keys.length : 0;
       const wordFilled = activeWord ? activeWord.keys.filter((k) => (letters[k] || "") !== "").length : 0;
+      const boardFull = Object.keys(grid).every((k) => (letters[k] || "") !== "");
 
       const enterSpace = (fn) => (e) => {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fn(); }
@@ -496,15 +500,13 @@
             );
           } else if (cl) {
             const on = activeWord && activeWord.idx === cl.idx;
-            const photoUrl = cl.photo ? IMG_BASE + cl.photo + ".jpeg" : null;
             cells.push(
               <div key={key}
-                className={"sw-cell sw-clue " + cl.dir + (cl.photo ? " sw-clue-photo" : "") + (on ? " on" : "")}
+                className={"sw-cell sw-clue " + cl.dir + (cl.photo ? " has-photo" : "") + (on ? " on" : "")}
                 role="button" tabIndex={0}
-                aria-label={`הגדרה מספר ${cl.n}, ${dirWord(cl.dir)}: ${cl.clue}. לחצו למעבר למילה`}
+                aria-label={`הגדרה מספר ${cl.n}, ${dirWord(cl.dir)}: ${cl.clue}. לחצו להצגת השאלה ומעבר למילה`}
                 onClick={() => selectWord(cl.idx)}
                 onKeyDown={enterSpace(() => selectWord(cl.idx))}>
-                {cl.photo && <img src={photoUrl} alt={cl.clue} loading="lazy" />}
                 <span className="sw-num">{cl.n}</span>
                 <span className="sw-arrow" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
@@ -528,7 +530,7 @@
                   aria-label={`הגדרה ${w.n} ${dirWord(w.dir)}: ${w.clue}`}
                   onClick={() => selectWord(w.idx)}>
                   <span className="sw-clue-num">{w.n}</span>
-                  <span className="sw-clue-txt">{w.clue}{w.photo ? " 📷" : ""}</span>
+                  <span className="sw-clue-txt">{w.clue}</span>
                 </button>
               </li>
             ))}
@@ -538,12 +540,9 @@
 
       if (view === "hero") {
         return (
-          <section className="cw-hero">
-            <img className="cw-hero-img" src="images/hero.jpeg"
-              alt="תשחץ מבצע יונתן בסימן 50 שנה — מורשת אמ״ן"
-              onError={(e) => { e.target.style.display = "none"; }} />
+          <section className="cw-hero" aria-label="מסך פתיחה — תשחץ מבצע יונתן בסימן 50 שנה, מורשת אמ״ן">
             <button className="cw-start" type="button" aria-label="התחילו את התשחץ"
-              onClick={() => { setView("puzzle"); window.scrollTo(0, 0); }}>
+              onClick={() => { setView("puzzle"); window.scrollTo({ top: 0, behavior: "instant" }); }}>
               <span>התחילו את התשחץ</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6" /></svg>
             </button>
@@ -580,7 +579,7 @@
                     <span className="sw-wordbar"><span className="sw-wordbar-fill" style={{ width: `${wordLen ? (wordFilled / wordLen) * 100 : 0}%` }} /></span>
                   </span>
                 </React.Fragment>
-              ) : "הקישו על מספר של הגדרה, על משבצת, או על שורה ברשימה כדי להתחיל"}
+              ) : "לחצו על מספר בתשחץ כדי להציג את השאלה"}
             </div>
 
             <div className="sw-wrap">
@@ -610,7 +609,7 @@
             </div>
 
             <div className="sw-actions">
-              <button className="sw-btn sw-btn-primary" onClick={check}>בדיקת תשובות</button>
+              <button className="sw-btn sw-btn-primary" onClick={check}>{boardFull ? "סיימתי – בדיקת תשובות" : "בדיקת תשובות"}</button>
               <button className="sw-btn sw-btn-ghost" onClick={clearAll}>ניקוי</button>
             </div>
 
