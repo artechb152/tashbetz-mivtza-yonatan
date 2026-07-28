@@ -126,10 +126,9 @@
       width:clamp(4px,1.7cqw,7px);height:clamp(4px,1.7cqw,7px);background:var(--neon);box-shadow:0 0 3px rgba(0,0,0,.6);}
     .sw-clue-photo img{width:100%;height:100%;object-fit:cover;object-position:center 26%;display:block;}
 
-    /* מספר ההגדרה — שבב לבן ברור וקריא בפינה העליונה, מעל הכל (לא מכוסה ע"י חץ/תמונה) */
-    .sw-num{position:absolute;top:1px;right:1px;z-index:7;line-height:1;font-weight:900;
-      color:#f3fff5;background:rgba(8,20,10,.72);border:0;border-radius:3px;
-      text-align:center;padding:0 3px;font-size:clamp(8px,3cqw,13px);}
+    /* מספר ההגדרה — קטן וכהה בפינה העליונה-ימנית של משבצת התשובה (מבנה תשבץ קלאסי) */
+    .sw-num{position:absolute;top:0;right:1px;z-index:3;line-height:1;font-weight:800;
+      color:#1a3a1e;font-size:clamp(7px,2.7cqw,11px);pointer-events:none;}
     .sw-clue-photo .sw-num{background:rgba(8,20,10,.82);}
 
     /* חץ = הכפתור. עיגול ניאון קטן ונקי, בקצה שמצביע אל התשובה */
@@ -325,9 +324,6 @@
         }
         return { ...w, idx: i, keys };
       });
-      // מספור בסדר קריאה: מלמעלה למטה, ומימין לשמאל (עמודה גבוהה = ימין)
-      [...words].sort((a, b) => a.clueRow - b.clueRow || b.clueCol - a.clueCol)
-        .forEach((w, i) => { w.n = i + 1; });
       const grid = {};
       for (const w of words) {
         w.keys.forEach((key, k) => {
@@ -336,13 +332,22 @@
           grid[key][w.dir] = w.idx;
         });
       }
-      const clues = {};
-      for (const w of words) clues[K(w.clueRow, w.clueCol)] = { idx: w.idx, dir: w.dir, clue: w.clue, photo: w.photo, n: w.n };
-      return { words, grid, clues };
+      // מבנה תשבץ קלאסי: מספר בפינת התא הראשון של כל מילה, בסדר קריאה (שורה עולה, ובתוכה עמודה יורדת=ימין קודם).
+      // תא שמתחיל גם מילה מאוזנת וגם מאונכת מקבל מספר אחד משותף.
+      const starts = {};
+      for (const w of words) {
+        const key = w.keys[0];
+        const [sr, sc] = key.split(",").map(Number);
+        if (!starts[key]) starts[key] = { key, r: sr, c: sc, across: null, down: null };
+        starts[key][w.dir] = w.idx;
+      }
+      Object.values(starts).sort((a, b) => a.r - b.r || b.c - a.c).forEach((s, i) => { s.n = i + 1; });
+      for (const w of words) w.n = starts[w.keys[0]].n;
+      return { words, grid, starts };
     }
 
     function Crossword() {
-      const { words, grid, clues } = useMemo(buildModel, []);
+      const { words, grid, starts } = useMemo(buildModel, []);
       const W = LAYOUT.W, H = LAYOUT.H;
 
       const [letters, setLetters] = useState({});
@@ -418,6 +423,7 @@
         else
           dir = cell.across != null ? "across" : "down";
         setActive({ key, dir });
+        setZoom((z) => Math.max(z, 1.3)); // זום-אין קל בבחירת מילה
         focusKbd();
       };
 
@@ -535,36 +541,21 @@
         for (let c = 0; c < W; c++) {
           const key = K(r, c);
           const lc = grid[key];
-          const cl = clues[key];
           if (lc) {
             const st = status[key];
             const isActive = active && active.key === key;
+            const sn = starts[key]; // מספר בפינה אם התא מתחיל מילה
             cells.push(
               <div key={key}
                 ref={(el) => (cellRefs.current[key] = el)}
                 className={"sw-cell sw-lc" + (activeKeys.has(key) ? " inword" : "") +
                   (isActive ? " active" : "") + (st === "ok" ? " ok" : "") + (st === "bad" ? " bad" : "") + (st === "miss" ? " miss" : "")}
                 role="button" tabIndex={0}
-                aria-label={`משבצת שורה ${r + 1} עמודה ${c + 1}${letters[key] ? `, אות ${letters[key]}` : ", ריקה"}`}
+                aria-label={`משבצת שורה ${r + 1} עמודה ${c + 1}${sn ? `, תחילת הגדרה ${sn.n}` : ""}${letters[key] ? `, אות ${letters[key]}` : ", ריקה"}`}
                 onClick={() => selectCell(key)}
                 onKeyDown={enterSpace(() => selectCell(key))}>
+                {sn && <span className="sw-num">{sn.n}</span>}
                 <span className="sw-lc-letter">{letters[key] || ""}</span>
-              </div>
-            );
-          } else if (cl) {
-            const on = activeWord && activeWord.idx === cl.idx;
-            cells.push(
-              <div key={key}
-                className={"sw-cell sw-clue " + cl.dir + (cl.photo ? " sw-clue-photo" : "") + (on ? " on" : "")}
-                role="button" tabIndex={0}
-                aria-label={`הגדרה מספר ${cl.n}, ${dirWord(cl.dir)}: ${cl.clue}. לחצו להצגת השאלה ומעבר למילה`}
-                onClick={() => selectWord(cl.idx)}
-                onKeyDown={enterSpace(() => selectWord(cl.idx))}>
-                {cl.photo && <img src={IMG_BASE + cl.photo + ".jpeg"} alt={cl.clue} loading="lazy" />}
-                <span className="sw-num">{cl.n}</span>
-                <span className="sw-arrow" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
-                </span>
               </div>
             );
           } else {
