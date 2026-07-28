@@ -244,9 +244,10 @@
       .sw-wordbar{width:56px;height:6px;}
       /* הכרטיס הלבן מתהדק בדיוק סביב הלוח (בלי שוליים לבנים), וממורכז במרחב הפנוי */
       .sw-wrap{flex:0 1 auto;min-height:0;width:fit-content;max-width:100%;margin:auto;padding:4px;border-radius:10px;
-        display:flex;justify-content:center;overflow:auto;}
-      /* הלוח גדול ככל האפשר: מוגבל ברוחב המסך או בגובה הפנוי — הקטן מביניהם, תוך שמירת יחס */
-      .sw-board{width:calc(100vw - 18px);
+        display:flex;justify-content:center;justify-content:safe center;align-items:safe center;overflow:auto;}
+      /* הלוח גדול ככל האפשר: מוגבל ברוחב המסך או בגובה הפנוי — הקטן מביניהם, תוך שמירת יחס.
+         flex-shrink:0 כדי שבזום הלוח לא יתכווץ לכרטיס אלא יגלוש ויתאפשר גלילה פנימית. */
+      .sw-board{flex:none;width:calc((100vw - 18px) * var(--zoom, 1));
         width:calc(min(100vw - 18px, (100svh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));height:auto;}
       .sw-zoomctl{margin:0;flex:none;gap:12px;}
       .sw-zoombtn{width:clamp(44px,12vw,52px);height:clamp(44px,12vw,52px);font-size:18px;}
@@ -271,7 +272,7 @@
       .sw-banner-thumb{width:54px;height:54px;}
       .sw-banner-clue{font-size:13px;}
       .sw-wrap{padding:3px;}
-      .sw-board{width:calc(100vw - 14px);
+      .sw-board{width:calc((100vw - 14px) * var(--zoom, 1));
         width:calc(min(100vw - 14px, (100svh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));}
       .sw-zoombtn{width:44px;height:44px;}
       .sw-btn{font-size:14px;padding:9px 16px;}
@@ -391,19 +392,20 @@
         }
       }, [active, zoom]);
 
-      // גלילה עדינה כדי שהמילה הפעילה תהיה בשדה הראייה
+      // גלילה כדי שהמילה הפעילה תהיה במרכז שדה הראייה (רץ גם בשינוי זום)
       useEffect(() => {
         if (!activeWord) return;
         const t = setTimeout(() => {
           const el = cellRefs.current[activeWord.keys[0]];
-          if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
-        }, 60);
+          if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+        }, 90);
         return () => clearTimeout(t);
-      }, [activeWord]);
+      }, [activeWord, zoom]);
 
       const selectWord = (idx) => {
         const w = words[idx];
         setActive({ key: w.keys[0], dir: w.dir });
+        setZoom((z) => Math.max(z, 1.3)); // זום-אין קל בבחירת הגדרה
         focusKbd();
       };
 
@@ -436,7 +438,15 @@
         setWon(false);
         setCheckMsg(null);
         const nxt = stepInWord(key, dir, +1);
-        if (nxt) setActive({ key: nxt, dir });
+        if (nxt) { setActive({ key: nxt, dir }); return; }
+        // המילה הושלמה — מעבר אוטומטי להגדרה הבאה לפי מספר
+        const id = grid[key][dir];
+        if (id != null) {
+          const ordered = [...words].sort((a, b) => a.n - b.n);
+          const pos = ordered.findIndex((w) => w.idx === id);
+          const nextW = ordered[(pos + 1) % ordered.length];
+          if (nextW) setActive({ key: nextW.keys[0], dir: nextW.dir });
+        }
       };
 
       // סיום אוטומטי: כשכל הלוח מלא — בדיקה אוטומטית (הצלחה או הפניה לכפתור הבדיקה)
