@@ -27,9 +27,9 @@
     @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
 
     /* ===== מסך פתיחה (hero) — מסך עצמאי שממלא בדיוק את כל מסך הטלפון ===== */
-    .cw-hero{position:relative;width:100%;overflow:hidden;margin:0;
-      min-height:100vh;min-height:-webkit-fill-available;min-height:100svh;min-height:100dvh;
-      height:100vh;height:-webkit-fill-available;height:100svh;height:100dvh;
+    /* position:fixed + inset:0 ממלא בדיוק את אזור התצוגה הנראה בכל דפדפן, כולל הדפדפן הפנימי של
+       וואטסאפ באייפון (אמין יותר מ-100dvh, שלא תמיד מדויק שם). זהו ה-view היחיד לפני לחיצה. */
+    .cw-hero{position:fixed;top:0;right:0;bottom:0;left:0;overflow:hidden;margin:0;z-index:5;
       background:#26331b url("images/hero.jpeg") center center / cover no-repeat;
       display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
       padding:env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 16px);}
