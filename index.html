@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -27,7 +27,9 @@
     @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto;}}
 
     /* ===== מסך פתיחה (hero) — מסך עצמאי שממלא בדיוק את כל מסך הטלפון ===== */
-    .cw-hero{position:relative;width:100vw;min-height:100dvh;height:100dvh;overflow:hidden;margin:0;
+    .cw-hero{position:relative;width:100%;overflow:hidden;margin:0;
+      min-height:100vh;min-height:-webkit-fill-available;min-height:100svh;min-height:100dvh;
+      height:100vh;height:-webkit-fill-available;height:100svh;height:100dvh;
       background:#26331b url("images/hero.jpeg") center center / cover no-repeat;
       display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
       padding:env(safe-area-inset-top) 12px calc(env(safe-area-inset-bottom) + 16px);}
@@ -227,7 +229,8 @@
     /* ===== התאמות מובייל — כל מסך המשחק נכנס למסך אחד (100dvh) ללא גלילה ===== */
     @media(max-width:600px){
       /* פריסת עמודה: כותרת/פס/כרטיס/זום/כפתור בגובה טבעי, והלוח תופס את מה שנשאר */
-      .sw-root{display:flex;flex-direction:column;min-height:100dvh;gap:6px;--nonboard:290px;
+      .sw-root{display:flex;flex-direction:column;gap:6px;--nonboard:290px;
+        min-height:100vh;min-height:-webkit-fill-available;min-height:100svh;min-height:100dvh;
         padding:6px 5px calc(env(safe-area-inset-bottom) + 6px);}
       .sw-title{margin:0;flex:none;}
       .sw-title h1{font-size:clamp(17px,4.7vw,22px);line-height:1.12;}
@@ -243,11 +246,12 @@
       .sw-wrap{flex:0 1 auto;min-height:0;width:fit-content;max-width:100%;margin:auto;padding:4px;border-radius:10px;
         display:flex;justify-content:center;overflow:auto;}
       /* הלוח גדול ככל האפשר: מוגבל ברוחב המסך או בגובה הפנוי — הקטן מביניהם, תוך שמירת יחס */
-      .sw-board{width:calc(min(100vw - 18px, (100dvh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));height:auto;}
+      .sw-board{width:calc(100vw - 18px);
+        width:calc(min(100vw - 18px, (100svh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));height:auto;}
       .sw-zoomctl{margin:0;flex:none;gap:12px;}
-      .sw-zoombtn{width:44px;height:44px;font-size:18px;}
+      .sw-zoombtn{width:clamp(44px,12vw,52px);height:clamp(44px,12vw,52px);font-size:18px;}
       .sw-actions{margin:0;flex:none;gap:10px;}
-      .sw-btn{font-size:14px;padding:9px 20px;min-height:42px;}
+      .sw-btn{font-size:15px;padding:11px 22px;min-height:48px;}
       .sw-checkmsg{margin:6px 0 0;flex:none;font-size:13px;padding:9px 12px;}
     }
     /* מסכים נמוכים (למשל iPhone SE 375×667) — כווץ עוד את החלקים שאינם הלוח */
@@ -258,6 +262,19 @@
     }
     @media(max-width:400px){
       .sw-banner-clue{font-size:14px;}
+    }
+    /* iPhone SE דור ראשון וכל מסך צר במיוחד (עד 359px) — כיווץ עדין, האותיות נשארות קריאות */
+    @media(max-width:359px){
+      .sw-root{padding:5px 4px calc(env(safe-area-inset-bottom) + 5px);--nonboard:278px;gap:5px;}
+      .sw-title h1{font-size:16px;line-height:1.1;}
+      .sw-banner{padding:6px 8px;gap:6px;}
+      .sw-banner-thumb{width:54px;height:54px;}
+      .sw-banner-clue{font-size:13px;}
+      .sw-wrap{padding:3px;}
+      .sw-board{width:calc(100vw - 14px);
+        width:calc(min(100vw - 14px, (100svh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));}
+      .sw-zoombtn{width:44px;height:44px;}
+      .sw-btn{font-size:14px;padding:9px 16px;}
     }
   </style>
 </head>
@@ -611,8 +628,8 @@
 
             <div className="sw-wrap">
               <div className="sw-board" ref={boardRef} style={{
-                gridTemplateColumns: `repeat(${W}, 1fr)`,
-                gridTemplateRows: `repeat(${H}, 1fr)`,
+                gridTemplateColumns: `repeat(${W}, minmax(0, 1fr))`,
+                gridTemplateRows: `repeat(${H}, minmax(0, 1fr))`,
                 aspectRatio: `${W} / ${H}`,
                 "--zoom": zoom,
               }}>
