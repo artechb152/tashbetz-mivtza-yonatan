@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -227,8 +227,8 @@
     /* ===== התאמות מובייל — כל מסך המשחק נכנס למסך אחד (100dvh) ללא גלילה ===== */
     @media(max-width:600px){
       /* פריסת עמודה: כותרת/פס/כרטיס/זום/כפתור בגובה טבעי, והלוח תופס את מה שנשאר */
-      .sw-root{display:flex;flex-direction:column;min-height:100dvh;gap:6px;--nonboard:292px;
-        padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);}
+      .sw-root{display:flex;flex-direction:column;min-height:100dvh;gap:6px;--nonboard:290px;
+        padding:6px 5px calc(env(safe-area-inset-bottom) + 6px);}
       .sw-title{margin:0;flex:none;}
       .sw-title h1{font-size:clamp(17px,4.7vw,22px);line-height:1.12;}
       .sw-bar{margin:0;flex:none;}
@@ -239,10 +239,11 @@
       .sw-banner-meta{gap:3px;}
       .sw-banner-count{font-size:11px;}
       .sw-wordbar{width:56px;height:6px;}
-      /* אזור הלוח ממלא את הגובה שנשאר; הלוח מתאים לגובה תוך שמירת יחס וקריאוּת (גלילה/זום פנימיים בלבד) */
-      .sw-wrap{flex:1 1 auto;min-height:0;margin:0;padding:3px;border-radius:10px;
-        display:flex;align-items:center;justify-content:center;overflow:auto;}
-      .sw-board{width:calc(min(100%, (100dvh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));height:auto;}
+      /* הכרטיס הלבן מתהדק בדיוק סביב הלוח (בלי שוליים לבנים), וממורכז במרחב הפנוי */
+      .sw-wrap{flex:0 1 auto;min-height:0;width:fit-content;max-width:100%;margin:auto;padding:4px;border-radius:10px;
+        display:flex;justify-content:center;overflow:auto;}
+      /* הלוח גדול ככל האפשר: מוגבל ברוחב המסך או בגובה הפנוי — הקטן מביניהם, תוך שמירת יחס */
+      .sw-board{width:calc(min(100vw - 18px, (100dvh - var(--nonboard)) * 14 / 19) * var(--zoom, 1));height:auto;}
       .sw-zoomctl{margin:0;flex:none;gap:12px;}
       .sw-zoombtn{width:44px;height:44px;font-size:18px;}
       .sw-actions{margin:0;flex:none;gap:10px;}
