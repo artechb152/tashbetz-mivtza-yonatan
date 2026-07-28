@@ -217,6 +217,8 @@
     .sw-win-card h2{margin:6px 0;font-size:24px;color:#14532d;}
     .sw-win-card p{margin:0 0 18px;color:#475569;}
     .sw-win-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+    .sw-prize-tel{display:inline-block;margin-top:6px;font-size:25px;font-weight:900;color:#1f7a2e;
+      text-decoration:none;direction:ltr;letter-spacing:.5px;}
     @keyframes swFade{from{opacity:0}to{opacity:1}}
     @keyframes swPop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
     @media (prefers-reduced-motion: reduce){
@@ -468,7 +470,7 @@
         }
         setStatus(next);
         const solvedCount = words.filter((w) => w.keys.every((k) => norm(letters[k] || "") === grid[k].sol)).length;
-        if (wrong === 0 && empty === 0) {
+        if (solvedCount > 14) {
           setWon(true); setCheckMsg(null);
         } else {
           let tail = "";
@@ -525,11 +527,12 @@
             const on = activeWord && activeWord.idx === cl.idx;
             cells.push(
               <div key={key}
-                className={"sw-cell sw-clue " + cl.dir + (cl.photo ? " has-photo" : "") + (on ? " on" : "")}
+                className={"sw-cell sw-clue " + cl.dir + (cl.photo ? " sw-clue-photo" : "") + (on ? " on" : "")}
                 role="button" tabIndex={0}
                 aria-label={`הגדרה מספר ${cl.n}, ${dirWord(cl.dir)}: ${cl.clue}. לחצו להצגת השאלה ומעבר למילה`}
                 onClick={() => selectWord(cl.idx)}
                 onKeyDown={enterSpace(() => selectWord(cl.idx))}>
+                {cl.photo && <img src={IMG_BASE + cl.photo + ".jpeg"} alt={cl.clue} loading="lazy" />}
                 <span className="sw-num">{cl.n}</span>
                 <span className="sw-arrow" aria-hidden="true">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M6 13l6 6 6-6" /></svg>
@@ -578,7 +581,7 @@
           <div id="puzzle" className="sw-root" dir="rtl">
             <div className="sw-title">
               <h1>תשחץ מבצע יונתן — בסימן 50 שנה</h1>
-              {!isMobile && <p>מורשת אמ״ן · המספרים שבמשבצות מפנים לרשימת ההגדרות שמתחת ללוח</p>}
+              {!isMobile && <p>מורשת אמ״ן · לחצו על מספר בלוח כדי להציג את השאלה</p>}
             </div>
 
             <div className="sw-bar">
@@ -626,14 +629,6 @@
                 onClick={() => setZoom((z) => Math.min(+(z * 1.2).toFixed(3), 2.2))}>+</button>
             </div>
 
-            {/* רשימת ההגדרות — מרונדרת רק בדסקטופ. במובייל היא לא נוצרת ב-DOM כלל (תנאי React, לא CSS). */}
-            {!isMobile && (
-              <div className="sw-clues" aria-label="רשימת הגדרות">
-                <ClueList title="מאוזן" items={acrossClues} />
-                <ClueList title="מאונך" items={downClues} />
-              </div>
-            )}
-
             <div className="sw-actions">
               <button className="sw-btn sw-btn-primary" onClick={check}>{boardFull ? "סיימתי – בדיקת תשובות" : "בדיקת תשובות"}</button>
               <button className="sw-btn sw-btn-ghost" onClick={clearAll}>ניקוי</button>
@@ -647,7 +642,7 @@
             )}
 
             {!isMobile && (
-              <p className="sw-hint">כל משבצת כהה עם מספר היא הגדרה, והחץ מצביע לכיוון התשובה. בהגדרות המצולמות — התמונה מוצגת בהגדלה בסרגל שמעל הלוח.</p>
+              <p className="sw-hint">כל משבצת כהה עם מספר היא הגדרה, והחץ מצביע לכיוון התשובה. לחצו על מספר כדי לראות את השאלה למעלה.</p>
             )}
           </div>
 
@@ -667,12 +662,10 @@
             <div className="sw-win" onClick={() => setWon(false)}>
               <div className="sw-win-card" onClick={(e) => e.stopPropagation()}>
                 <div className="sw-win-emoji">🎉</div>
-                <h2>כל הכבוד!</h2>
-                <p>השלמתם את תשחץ מבצע יונתן — כל התשובות נכונות.</p>
+                <h2>סיימת את התשחץ בהצלחה!</h2>
+                <p>לקבלת הפרס — צלמו מסך ופנו למספר:<br /><a className="sw-prize-tel" href="tel:0528450277">052-8450277</a></p>
                 <div className="sw-win-actions">
-                  <button className="sw-btn sw-btn-primary"
-                    onClick={() => { setWon(false); setScreen("intro"); window.scrollTo(0, 0); }}>למסך הפתיחה</button>
-                  <button className="sw-btn sw-btn-ghost" onClick={() => setWon(false)}>המשך לצפייה בלוח</button>
+                  <button className="sw-btn sw-btn-primary" onClick={() => setWon(false)}>סגירה</button>
                 </div>
               </div>
             </div>
