@@ -43,8 +43,8 @@
        גובה אמיתי מ-visualViewport (משתנה --app-h) — אמין בסאפארי ובדפדפן הפנימי של וואטסאפ.
        פריסת עמודה: כל שורה בגובה הטבעי שלה, ואזור הלוח (.stage) בולע את כל מה שנשאר. */
     .app{position:fixed;top:0;left:0;right:0;height:var(--app-h,100dvh);
-      display:flex;flex-direction:column;gap:6px;
-      padding:calc(env(safe-area-inset-top) + 6px) 5px calc(env(safe-area-inset-bottom) + 6px);
+      display:flex;flex-direction:column;gap:4px;
+      padding:calc(env(safe-area-inset-top) + 4px) 5px calc(env(safe-area-inset-bottom) + 4px);
       color:#eafff0;
       background-color:#2f4020;
       background-image:
@@ -54,25 +54,25 @@
         radial-gradient(circle at 20% 84%, #24311a 0 16%, transparent 16.5%),
         radial-gradient(circle at 92% 80%, #38502a 0 14%, transparent 14.5%);}
 
-    /* --- שורת מצב עליונה --- */
-    .top{flex:none;display:flex;align-items:center;gap:9px;}
-    .top h1{margin:0;font-size:15px;font-weight:900;white-space:nowrap;letter-spacing:.2px;
+    /* --- שורת מצב עליונה — דקה ככל האפשר בנייד, כדי לפנות גובה ללוח --- */
+    .top{flex:none;display:flex;align-items:center;gap:8px;}
+    .top h1{display:none;margin:0;font-size:15px;font-weight:900;white-space:nowrap;letter-spacing:.2px;
       text-shadow:0 1px 0 rgba(0,0,0,.4);}
-    .bar{flex:1;height:9px;min-width:40px;background:rgba(255,255,255,.22);border-radius:999px;overflow:hidden;}
+    .bar{flex:1;height:7px;min-width:40px;background:rgba(255,255,255,.22);border-radius:999px;overflow:hidden;}
     .bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#8fe39a,#3be84b);
       transition:width .35s ease;}
-    .cnt{font-size:12.5px;font-weight:800;white-space:nowrap;opacity:.95;}
+    .cnt{font-size:11.5px;font-weight:800;white-space:nowrap;opacity:.95;line-height:1;}
 
     /* --- כרטיס ההגדרה הפעילה --- */
-    .clue{flex:none;background:#fff;color:#152d19;border-radius:13px;padding:9px 11px;
-      display:flex;align-items:center;gap:9px;min-height:56px;
-      box-shadow:0 6px 16px rgba(0,0,0,.28);}
+    .clue{flex:none;background:#fff;color:#152d19;border-radius:12px;padding:7px 10px;
+      display:flex;align-items:center;gap:8px;min-height:46px;
+      box-shadow:0 5px 14px rgba(0,0,0,.28);}
     .clue.empty{justify-content:center;text-align:center;color:#5b6b52;font-weight:800;font-size:14px;}
     .clue-tag{flex:none;background:#dff5e0;color:#1f7a2e;font-weight:900;font-size:12px;
       padding:4px 8px;border-radius:8px;white-space:nowrap;border:1px solid #86d38f;}
     .clue-txt{flex:1 1 auto;min-width:0;font-size:15px;font-weight:800;line-height:1.28;}
-    .clue-thumb{flex:none;width:52px;height:52px;object-fit:cover;object-position:center 28%;
-      border-radius:9px;border:2px solid #8fbf7a;cursor:pointer;}
+    .clue-thumb{flex:none;width:44px;height:44px;object-fit:cover;object-position:center 28%;
+      border-radius:8px;border:2px solid #8fbf7a;cursor:pointer;}
     .clue-len{flex:none;font-size:11.5px;font-weight:800;color:#3a5233;white-space:nowrap;}
 
     /* --- אזור הלוח: בולע את השטח הפנוי, הלוח ממורכז בתוכו --- */
@@ -98,28 +98,35 @@
       background:#1f7a2e;pointer-events:none;}
 
     /* --- סרגל תחתון: ניווט בין הגדרות + בדיקה --- */
-    .tools{flex:none;display:flex;align-items:center;gap:7px;}
-    .nav{flex:none;width:46px;height:44px;border-radius:12px;border:0;cursor:pointer;
+    .tools{flex:none;display:flex;align-items:center;gap:6px;}
+    .nav{flex:none;width:42px;height:42px;border-radius:11px;border:0;cursor:pointer;
       background:rgba(255,255,255,.16);color:#eafff0;font-size:19px;font-weight:900;
       display:flex;align-items:center;justify-content:center;font-family:inherit;}
     .nav:active{transform:scale(.94);}
-    .go{flex:1 1 auto;height:44px;border-radius:12px;border:0;cursor:pointer;font-family:inherit;
+    .go{flex:1 1 auto;height:42px;border-radius:11px;border:0;cursor:pointer;font-family:inherit;
       background:#2ea043;color:#fff;font-size:15px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.28);}
     .go:active{transform:scale(.985);}
     .go.ghost{flex:none;padding:0 14px;background:rgba(255,255,255,.16);box-shadow:none;font-size:13.5px;}
+    /* כשהלוח מלא הכפתור מהבהב — במקום חלונית שמבקשת ללחוץ עליו */
+    .go.ready{animation:ready 1.15s ease-in-out infinite;}
+    @keyframes ready{
+      0%,100%{background:#2ea043;box-shadow:0 4px 12px rgba(0,0,0,.28),0 0 0 0 rgba(62,232,75,.65);}
+      50%    {background:#42c95a;box-shadow:0 4px 18px rgba(0,0,0,.3),0 0 0 9px rgba(62,232,75,0);}}
 
     /* --- מקלדת עברית מובנית (לא תלויה בשפת המקלדת של הטלפון) --- */
     .kb{flex:none;display:flex;flex-direction:column;gap:5px;}
     .kb-row{display:flex;gap:4px;justify-content:center;}
     /* גובה המקשים נגזר מגובה החלון בלבד (לא מגודל התא) — כדי שלא ייווצר לולאת-מדידה
        שבה המקלדת משנה את שטח הלוח והלוח משנה בחזרה את גובה המקלדת. */
-    .key{flex:1 1 0;min-width:0;height:clamp(34px,5.2vh,46px);border:0;border-radius:8px;cursor:pointer;
-      background:#f2f6e8;color:#16261a;font-family:inherit;font-size:clamp(16px,2.5vh,21px);font-weight:800;
+    /* רוחב אחיד לכל המקשים לפי השורה הארוכה (10 מקשים), והשורות הקצרות ממורכזות —
+       בדיוק כמו מקלדת אמיתית. */
+    .key{flex:0 0 calc((100% - 36px) / 10);min-width:0;height:clamp(32px,5.1vh,46px);
+      border:0;border-radius:8px;cursor:pointer;
+      background:#f2f6e8;color:#16261a;font-family:inherit;font-size:clamp(15px,2.4vh,21px);font-weight:800;
       display:flex;align-items:center;justify-content:center;padding:0;
       box-shadow:0 2px 0 rgba(0,0,0,.32);}
     .key:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.32);background:#dfe9cc;}
-    .key.del{background:#4a5f3c;color:#f2f6e8;flex:1.5 1 0;font-size:16px;}
-    .key.spacer{background:transparent;box-shadow:none;pointer-events:none;}
+    .key.del{background:#4a5f3c;color:#f2f6e8;font-size:16px;}
 
     /* --- הודעת בדיקה --- שורה רגילה בפריסה, מתחת לכרטיס ההגדרה.
        קודם היא ריחפה בתחתית המסך והסתירה 17 מתוך 23 מקשי המקלדת. */
@@ -147,7 +154,9 @@
     /* ===================== מסכים גדולים ===================== */
     @media(min-width:900px) and (min-height:620px){
       .app{padding:18px 22px;gap:10px;}
-      .top h1{font-size:21px;}
+      .top h1{display:block;font-size:21px;}
+      .bar{height:9px;}
+      .cnt{font-size:13px;}
       .clue{max-width:none;padding:11px 14px;min-height:62px;}
       .clue-txt{font-size:17px;}
       .clue-thumb{width:60px;height:60px;}
@@ -276,11 +285,12 @@
     const K = (r, c) => r + "," + c;
     const dirWord = (d) => d === "across" ? "מאוזן" : "מאונך";
 
-    /* מקלדת עברית מובנית — בלי סופיות (הן מנורמלות ממילא). */
+    /* מקלדת עברית מובנית — בדיוק סדר המקשים של מקלדת עברית אמיתית,
+       כולל האותיות הסופיות (הן מנורמלות אוטומטית בבדיקת התשובה). */
     const KB_ROWS = [
-      ["ק","ר","א","ט","ו","פ"],
-      ["ש","ד","ג","כ","ע","י","ח","ל"],
-      ["ז","ס","ב","ה","נ","מ","צ","ת"],
+      ["ק","ר","א","ט","ו","ן","ם","פ"],
+      ["ש","ד","ג","כ","ע","י","ח","ל","ך","ף"],
+      ["ז","ס","ב","ה","נ","מ","צ","ת","ץ"],
     ];
 
     function buildModel() {
@@ -319,9 +329,25 @@
       const W = LAYOUT.W, H = LAYOUT.H;
 
       const [screen, setScreen] = useState("intro");
-      const [letters, setLetters] = useState({});
       const [status, setStatus] = useState({});
-      const [active, setActive] = useState(null);
+
+      /* letters/active מוחזקים גם ב-ref שמתעדכן מיידית.
+         בלי זה, שתי הקשות באותו tick קוראות את אותו ערך ישן מה-closure —
+         והאותיות נדרסות זו על זו במקום להתקדם במילה. */
+      const lettersRef = useRef({});
+      const activeRef = useRef(null);
+      const [letters, _setLetters] = useState({});
+      const [active, _setActive] = useState(null);
+      const setLetters = useCallback((upd) => {
+        const next = typeof upd === "function" ? upd(lettersRef.current) : upd;
+        lettersRef.current = next;
+        _setLetters(next);
+      }, []);
+      const setActive = useCallback((upd) => {
+        const next = typeof upd === "function" ? upd(activeRef.current) : upd;
+        activeRef.current = next;
+        _setActive(next);
+      }, []);
       const [won, setWon] = useState(false);
       const [lightbox, setLightbox] = useState(null);
       const [toast, setToast] = useState(null);
@@ -359,7 +385,8 @@
           // רוחב הלוח = cell*W + (W+1) פיקסלים של קווים/ריפוד
           const byW = (aw - (W + 1)) / W;
           const byH = (ah - (H + 1)) / H;
-          setCell(Math.max(13, Math.floor(Math.min(byW, byH))));
+          // בלי רצפה גבוהה — עדיף תא קטן מלוח שגולש מהמסך
+          setCell(Math.max(9, Math.floor(Math.min(byW, byH))));
         };
         calc();
         const ro = new ResizeObserver(calc);
@@ -367,14 +394,17 @@
         return () => ro.disconnect();
       }, [screen, W, H]);
 
-      const activeWord = useMemo(() => {
-        if (!active) return null;
-        const c = grid[active.key];
+      // המילה שאליה שייך מיקום נתון (משמש גם לרינדור וגם לטיפול בהקשות מתוך ה-ref)
+      const wordAt = useCallback((a) => {
+        if (!a) return null;
+        const c = grid[a.key];
         if (!c) return null;
-        let id = c[active.dir];
+        let id = c[a.dir];
         if (id == null) id = c.across != null ? c.across : c.down;
         return id != null ? words[id] : null;
-      }, [active, grid, words]);
+      }, [grid, words]);
+
+      const activeWord = useMemo(() => wordAt(active), [wordAt, active]);
 
       const selectWord = useCallback((w) => setActive({ key: w.keys[0], dir: w.dir }), []);
 
@@ -404,22 +434,26 @@
       };
 
       const typeLetter = (ch) => {
-        if (!activeWord) return;
-        const { key, dir } = active;
+        const a = activeRef.current;
+        const w = wordAt(a);
+        if (!w) return;
+        const { key, dir } = a;
         setLetters((v) => ({ ...v, [key]: ch }));
         setStatus({}); setWon(false); setToast(null);
         const nxt = stepInWord(key, dir, +1);
         if (nxt) { setActive({ key: nxt, dir }); return; }
         // סוף המילה — מעבר אוטומטי להגדרה הבאה
-        const pos = order.findIndex((w) => w.idx === activeWord.idx);
-        selectWord(order[(pos + 1) % order.length]);
+        const pos = order.findIndex((x) => x.idx === w.idx);
+        const nw = order[(pos + 1) % order.length];
+        setActive({ key: nw.keys[0], dir: nw.dir });
       };
 
       const backspace = () => {
-        if (!active) return;
-        const { key, dir } = active;
+        const a = activeRef.current;
+        if (!a) return;
+        const { key, dir } = a;
         setStatus({}); setWon(false); setToast(null);
-        if (letters[key]) setLetters((v) => ({ ...v, [key]: "" }));
+        if (lettersRef.current[key]) setLetters((v) => ({ ...v, [key]: "" }));
         else {
           const prev = stepInWord(key, dir, -1);
           if (prev) { setLetters((v) => ({ ...v, [prev]: "" })); setActive({ key: prev, dir }); }
@@ -471,13 +505,8 @@
 
       const clearAll = () => { setLetters({}); setStatus({}); setWon(false); setToast(null); };
 
-      // סיום אוטומטי כשהלוח מלא
-      useEffect(() => {
-        if (!boardFull) return;
-        const allRight = Object.keys(grid).every((k) => norm(letters[k]) === grid[k].sol);
-        if (allRight) setWon(true);
-        else setToast((t) => t || { kind: "warn", text: "הלוח מלא! לחצו על „בדיקת תשובות” כדי לראות מה לתקן." });
-      }, [boardFull, letters, grid]);
+      /* כשהלוח מלא לא קופצת שום חלונית — כפתור „סיימתי” מתחיל להבהב,
+         והתוצאה (כולל פופאפ הפרס) מתגלה רק כשלוחצים עליו. */
 
       // הודעת הבדיקה נעלמת מעצמה, כדי שלא תגזול שורה מהלוח לאורך זמן
       useEffect(() => {
@@ -591,7 +620,9 @@
 
             <div className="tools">
               <button className="nav" onClick={() => gotoWord(-1)} aria-label="ההגדרה הקודמת">›</button>
-              <button className="go" onClick={check}>{boardFull ? "סיימתי — בדיקת תשובות" : "בדיקת תשובות"}</button>
+              <button className={"go" + (boardFull ? " ready" : "")} onClick={check}>
+                {boardFull ? "סיימתי!" : "בדיקת תשובות"}
+              </button>
               <button className="go ghost" onClick={clearAll}>ניקוי</button>
               <button className="nav" onClick={() => gotoWord(1)} aria-label="ההגדרה הבאה">‹</button>
             </div>
@@ -599,12 +630,10 @@
             <div className="kb" role="group" aria-label="מקלדת עברית">
               {KB_ROWS.map((row, i) => (
                 <div className="kb-row" key={i}>
-                  {i === 0 && <span className="key spacer" />}
                   {row.map((ch) => (
                     <button key={ch} className="key" type="button"
                       onClick={() => typeLetter(ch)}>{ch}</button>
                   ))}
-                  {i === 0 && <span className="key spacer" />}
                   {i === 2 && (
                     <button className="key del" type="button" aria-label="מחיקה"
                       onClick={backspace}>⌫</button>
@@ -676,8 +705,8 @@
               </a>
             </div>
             <div className="win-actions">
-              <button className="solid" onClick={onClose}>סגירה</button>
-              <button onClick={onRestart}>מהתחלה</button>
+              <button className="solid" onClick={onRestart}>מהתחלה</button>
+              <button onClick={onClose}>סגירה</button>
             </div>
           </div>
         </div>
