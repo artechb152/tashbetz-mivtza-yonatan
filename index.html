@@ -114,7 +114,9 @@
       50%    {background:#42c95a;box-shadow:0 4px 18px rgba(0,0,0,.3),0 0 0 9px rgba(62,232,75,0);}}
 
     /* --- מקלדת עברית מובנית (לא תלויה בשפת המקלדת של הטלפון) --- */
-    .kb{flex:none;display:flex;flex-direction:column;gap:5px;}
+    /* המקלדת נפרסת משמאל לימין (direction:ltr) — כמו מקלדת עברית אמיתית באייפון,
+       שבה ק נמצאת בקצה השמאלי ולא הימני. בלי זה ה-RTL של הדף הופך את סדר המקשים. */
+    .kb{flex:none;display:flex;flex-direction:column;gap:5px;direction:ltr;}
     .kb-row{display:flex;gap:4px;justify-content:center;}
     /* גובה המקשים נגזר מגובה החלון בלבד (לא מגודל התא) — כדי שלא ייווצר לולאת-מדידה
        שבה המקלדת משנה את שטח הלוח והלוח משנה בחזרה את גובה המקלדת. */
@@ -126,7 +128,7 @@
       display:flex;align-items:center;justify-content:center;padding:0;
       box-shadow:0 2px 0 rgba(0,0,0,.32);}
     .key:active{transform:translateY(1px);box-shadow:0 1px 0 rgba(0,0,0,.32);background:#dfe9cc;}
-    .key.del{background:#4a5f3c;color:#f2f6e8;font-size:16px;}
+    .key.del{flex:0 0 calc((100% - 36px) / 10 * 1.3);background:#4a5f3c;color:#f2f6e8;font-size:16px;}
 
     /* --- הודעת בדיקה --- שורה רגילה בפריסה, מתחת לכרטיס ההגדרה.
        קודם היא ריחפה בתחתית המסך והסתירה 17 מתוך 23 מקשי המקלדת. */
@@ -336,6 +338,7 @@
          והאותיות נדרסות זו על זו במקום להתקדם במילה. */
       const lettersRef = useRef({});
       const activeRef = useRef(null);
+      const typedRef = useRef([]);
       const [letters, _setLetters] = useState({});
       const [active, _setActive] = useState(null);
       const setLetters = useCallback((upd) => {
@@ -439,6 +442,7 @@
         if (!w) return;
         const { key, dir } = a;
         setLetters((v) => ({ ...v, [key]: ch }));
+        typedRef.current.push(key);          // היסטוריית הקלדה — מאפשרת למחוק אחורה גם אחרי מעבר מילה
         setStatus({}); setWon(false); setToast(null);
         const nxt = stepInWord(key, dir, +1);
         if (nxt) { setActive({ key: nxt, dir }); return; }
@@ -448,15 +452,31 @@
         setActive({ key: nw.keys[0], dir: nw.dir });
       };
 
+      const forget = (k) => {
+        const i = typedRef.current.lastIndexOf(k);
+        if (i >= 0) typedRef.current.splice(i, 1);
+      };
+
       const backspace = () => {
         const a = activeRef.current;
         if (!a) return;
         const { key, dir } = a;
         setStatus({}); setWon(false); setToast(null);
-        if (lettersRef.current[key]) setLetters((v) => ({ ...v, [key]: "" }));
-        else {
-          const prev = stepInWord(key, dir, -1);
-          if (prev) { setLetters((v) => ({ ...v, [prev]: "" })); setActive({ key: prev, dir }); }
+        // 1. יש אות במשבצת הנוכחית
+        if (lettersRef.current[key]) { setLetters((v) => ({ ...v, [key]: "" })); forget(key); return; }
+        // 2. אחורה בתוך המילה הנוכחית
+        const prev = stepInWord(key, dir, -1);
+        if (prev) { setLetters((v) => ({ ...v, [prev]: "" })); forget(prev); setActive({ key: prev, dir }); return; }
+        /* 3. עומדים בתחילת מילה ריקה — למשל מיד אחרי השלמת המילה הקודמת, כשהסמן קפץ
+           אוטומטית להגדרה הבאה. חוזרים לאות האחרונה שהוקלדה בפועל ומוחקים אותה. */
+        while (typedRef.current.length) {
+          const last = typedRef.current.pop();
+          if (!lettersRef.current[last]) continue;
+          const c = grid[last];
+          if (!c) continue;
+          setLetters((v) => ({ ...v, [last]: "" }));
+          setActive({ key: last, dir: c[dir] != null ? dir : (c.across != null ? "across" : "down") });
+          return;
         }
       };
 
@@ -503,7 +523,7 @@
         setToast({ kind: wrong > 0 ? "warn" : "good", text: `${n} מתוך ${words.length} מילים נכונות.${tail}` });
       };
 
-      const clearAll = () => { setLetters({}); setStatus({}); setWon(false); setToast(null); };
+      const clearAll = () => { setLetters({}); setStatus({}); setWon(false); setToast(null); typedRef.current = []; };
 
       /* כשהלוח מלא לא קופצת שום חלונית — כפתור „סיימתי” מתחיל להבהב,
          והתוצאה (כולל פופאפ הפרס) מתגלה רק כשלוחצים עליו. */
@@ -634,7 +654,8 @@
                     <button key={ch} className="key" type="button"
                       onClick={() => typeLetter(ch)}>{ch}</button>
                   ))}
-                  {i === 2 && (
+                  {/* המחיקה יושבת בסוף השורה הראשונה, כמו במקלדת העברית של אייפון */}
+                  {i === 0 && (
                     <button className="key del" type="button" aria-label="מחיקה"
                       onClick={backspace}>⌫</button>
                   )}
