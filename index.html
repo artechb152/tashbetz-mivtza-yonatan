@@ -107,6 +107,9 @@
       background:#2ea043;color:#fff;font-size:15px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.28);}
     .go:active{transform:scale(.985);}
     .go.ghost{flex:none;padding:0 14px;background:rgba(255,255,255,.16);box-shadow:none;font-size:13.5px;}
+    .go.ghost.danger{background:#c2410c;color:#fff;animation:danger 1s ease-in-out infinite;}
+    @keyframes danger{0%,100%{box-shadow:0 0 0 0 rgba(240,120,60,.75);}
+                      50%    {box-shadow:0 0 0 8px rgba(240,120,60,0);}}
     /* כשהלוח מלא הכפתור מהבהב — במקום חלונית שמבקשת ללחוץ עליו */
     .go.ready{animation:ready 1.15s ease-in-out infinite;}
     @keyframes ready{
@@ -281,6 +284,24 @@
 
     window.__LAYOUT_FOR_TEST__ = LAYOUT;   // לשימוש בבדיקות אוטומטיות בלבד
 
+    /* ---- שמירת התקדמות ----
+       באייפון, מעבר לאפליקציה אחרת או נעילת מסך גורמים לספארי (ובמיוחד לדפדפן הפנימי
+       של וואטסאפ) לשחרר את הדף מהזיכרון ולטעון אותו מחדש — וכל האותיות נעלמו.
+       לכן כל שינוי נשמר מקומית ומשוחזר בטעינה. */
+    const SAVE_KEY = "tashbetz-mivtza-yonatan";
+    const SAVE_SIG = LAYOUT.W + "x" + LAYOUT.H + "|" + LAYOUT.words.map((w) => w.id).join(",");
+    const loadSaved = () => {
+      try {
+        const o = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+        // אם הפריסה השתנתה מאז, שמירה ישנה כבר לא רלוונטית
+        if (o && o.sig === SAVE_SIG && o.letters && typeof o.letters === "object") return o.letters;
+      } catch (e) {}
+      return {};
+    };
+    const saveNow = (letters) => {
+      try { localStorage.setItem(SAVE_KEY, JSON.stringify({ sig: SAVE_SIG, letters })); } catch (e) {}
+    };
+
     const FINALS = { "ך":"כ","ם":"מ","ן":"נ","ף":"פ","ץ":"צ" };
     const norm = (ch) => FINALS[ch] || ch;
     const isHeb = (ch) => /[א-ת]/.test(ch);
@@ -336,15 +357,17 @@
       /* letters/active מוחזקים גם ב-ref שמתעדכן מיידית.
          בלי זה, שתי הקשות באותו tick קוראות את אותו ערך ישן מה-closure —
          והאותיות נדרסות זו על זו במקום להתקדם במילה. */
-      const lettersRef = useRef({});
+      const restored = useMemo(loadSaved, []);
+      const lettersRef = useRef(restored);
       const activeRef = useRef(null);
       const typedRef = useRef([]);
-      const [letters, _setLetters] = useState({});
+      const [letters, _setLetters] = useState(restored);
       const [active, _setActive] = useState(null);
       const setLetters = useCallback((upd) => {
         const next = typeof upd === "function" ? upd(lettersRef.current) : upd;
         lettersRef.current = next;
         _setLetters(next);
+        saveNow(next);            // שמירה מיידית — לא מחכים לרינדור
       }, []);
       const setActive = useCallback((upd) => {
         const next = typeof upd === "function" ? upd(activeRef.current) : upd;
@@ -355,6 +378,7 @@
       const [lightbox, setLightbox] = useState(null);
       const [toast, setToast] = useState(null);
       const [cell, setCell] = useState(26);
+      const [askClear, setAskClear] = useState(false);   // „ניקוי” דורש אישור — הוא צמוד לכפתור הבדיקה
 
       const areaRef = useRef(null);
 
@@ -535,6 +559,13 @@
         return () => clearTimeout(t);
       }, [toast]);
 
+      // בקשת האישור לניקוי מתבטלת מעצמה אם לא לחצו שוב
+      useEffect(() => {
+        if (!askClear) return;
+        const t = setTimeout(() => setAskClear(false), 4000);
+        return () => clearTimeout(t);
+      }, [askClear]);
+
       const activeKeys = activeWord ? new Set(activeWord.keys) : new Set();
       const wordFilled = activeWord ? activeWord.keys.filter((k) => (letters[k] || "") !== "").length : 0;
 
@@ -545,6 +576,8 @@
             <button className="cw-start" type="button" onClick={() => {
               setScreen("game");
               setActive({ key: order[0].keys[0], dir: order[0].dir });
+              if (Object.values(restored).some(Boolean))
+                setToast({ kind: "good", text: "המשכנו מהמקום שבו הפסקת — ההתקדמות נשמרה." });
             }}>
               <span>התחילו את התשחץ</span>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2"
@@ -643,7 +676,11 @@
               <button className={"go" + (boardFull ? " ready" : "")} onClick={check}>
                 {boardFull ? "סיימתי!" : "בדיקת תשובות"}
               </button>
-              <button className="go ghost" onClick={clearAll}>ניקוי</button>
+              <button className={"go ghost" + (askClear ? " danger" : "")}
+                onClick={() => {
+                  if (!Object.values(lettersRef.current).some(Boolean)) return;   // אין מה לנקות
+                  if (askClear) { clearAll(); setAskClear(false); } else setAskClear(true);
+                }}>{askClear ? "לנקות?" : "ניקוי"}</button>
               <button className="nav" onClick={() => gotoWord(1)} aria-label="ההגדרה הבאה">‹</button>
             </div>
 
