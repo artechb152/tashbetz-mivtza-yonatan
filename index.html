@@ -121,10 +121,10 @@
     .key.del{background:#4a5f3c;color:#f2f6e8;flex:1.5 1 0;font-size:16px;}
     .key.spacer{background:transparent;box-shadow:none;pointer-events:none;}
 
-    /* --- הודעת בדיקה (צפה מעל הלוח, לא דוחפת את הפריסה) --- */
-    .toast{position:fixed;left:10px;right:10px;bottom:calc(env(safe-area-inset-bottom) + 12px);z-index:70;
-      border-radius:13px;padding:11px 14px;display:flex;align-items:center;gap:9px;
-      font-weight:800;font-size:14px;box-shadow:0 10px 28px rgba(0,0,0,.4);animation:pop .22s ease;}
+    /* --- הודעת בדיקה --- שורה רגילה בפריסה, מתחת לכרטיס ההגדרה.
+       קודם היא ריחפה בתחתית המסך והסתירה 17 מתוך 23 מקשי המקלדת. */
+    .toast{flex:none;border-radius:12px;padding:9px 12px;display:flex;align-items:center;gap:9px;
+      font-weight:800;font-size:13.5px;box-shadow:0 6px 16px rgba(0,0,0,.3);animation:pop .22s ease;}
     .toast.good{background:#dff5e0;color:#14532d;border:2px solid #2ea043;}
     .toast.warn{background:#fff4e0;color:#7c4a12;border:2px solid #e0a54d;}
     .toast button{margin-inline-start:auto;flex:none;border:0;background:transparent;color:inherit;
@@ -217,6 +217,19 @@
     @keyframes fade{from{opacity:0}to{opacity:1}}
     @keyframes rise{from{transform:translateY(26px) scale(.9);opacity:0}to{transform:none;opacity:1}}
     @keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+
+    /* ===================== מצב רוחבי בטלפון =====================
+       בגובה כזה הלוח (13×16) לא נכנס יחד עם המקלדת — במקום פריסה שבורה, מבקשים לסובב. */
+    .rotate{display:none;}
+    @media (orientation:landscape) and (max-height:520px){
+      .app{display:none!important;}
+      .rotate{position:fixed;top:0;left:0;right:0;height:var(--app-h,100dvh);z-index:200;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+        text-align:center;padding:24px;background:#26331b;color:#eafff0;}
+      .rotate svg{width:56px;height:56px;opacity:.9;}
+      .rotate b{font-size:19px;font-weight:900;}
+      .rotate span{font-size:14px;font-weight:700;opacity:.85;max-width:320px;line-height:1.5;}
+    }
 
     :focus-visible{outline:3px solid #f6ce67;outline-offset:2px;}
     @media (prefers-reduced-motion: reduce){
@@ -442,8 +455,9 @@
         let wrong = 0, empty = 0;
         for (const key of Object.keys(grid)) {
           const val = letters[key] || "";
-          if (!val) { next[key] = "miss"; empty++; }
-          else if (norm(val) === grid[key].sol) next[key] = "ok";
+          // משבצות ריקות נשארות ניטרליות — קודם כל הלוח נצבע אפור בלחיצה הראשונה
+          if (!val) { empty++; continue; }
+          if (norm(val) === grid[key].sol) next[key] = "ok";
           else { next[key] = "bad"; wrong++; }
         }
         setStatus(next);
@@ -464,6 +478,13 @@
         if (allRight) setWon(true);
         else setToast((t) => t || { kind: "warn", text: "הלוח מלא! לחצו על „בדיקת תשובות” כדי לראות מה לתקן." });
       }, [boardFull, letters, grid]);
+
+      // הודעת הבדיקה נעלמת מעצמה, כדי שלא תגזול שורה מהלוח לאורך זמן
+      useEffect(() => {
+        if (!toast) return;
+        const t = setTimeout(() => setToast(null), 6000);
+        return () => clearTimeout(t);
+      }, [toast]);
 
       const activeKeys = activeWord ? new Set(activeWord.keys) : new Set();
       const wordFilled = activeWord ? activeWord.keys.filter((k) => (letters[k] || "") !== "").length : 0;
@@ -548,6 +569,13 @@
               ) : "לחצו על משבצת בלוח כדי לראות את ההגדרה"}
             </div>
 
+            {toast && (
+              <div className={"toast " + toast.kind} role="status">
+                <span>{toast.text}</span>
+                <button onClick={() => setToast(null)} aria-label="סגירה">×</button>
+              </div>
+            )}
+
             <div className="stage">
               <div className="board-area" ref={areaRef}>
                 <div className="board" style={{
@@ -586,12 +614,15 @@
             </div>
           </div>
 
-          {toast && (
-            <div className={"toast " + toast.kind} role="status">
-              <span>{toast.text}</span>
-              <button onClick={() => setToast(null)} aria-label="סגירה">×</button>
-            </div>
-          )}
+          <div className="rotate" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"
+              strokeLinecap="round" strokeLinejoin="round">
+              <rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" />
+              <path d="M3.5 9.5a9 9 0 012.6-4.4M20.5 14.5a9 9 0 01-2.6 4.4" />
+            </svg>
+            <b>סובבו את הטלפון למצב אנכי</b>
+            <span>התשחץ בנוי לתצוגה לאורך — כך הלוח והמקלדת נכנסים יחד במסך אחד.</span>
+          </div>
 
           {lightbox && (
             <div className="lb" onClick={() => setLightbox(null)}>
