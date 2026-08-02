@@ -526,6 +526,10 @@
 
       const isSolved = (w) => w.keys.every((k) => norm(letters[k] || "") === grid[k].sol);
       const solvedWords = words.filter(isSolved).length;
+      /* הציר העליון מודד כמה מילים מולאו עד הסוף — בלי קשר לנכונות.
+         (הספירה הנכונה, solvedWords, משמשת רק לבדיקה ולפופאפ הסיום.) */
+      const isFilled = (w) => w.keys.every((k) => (letters[k] || "") !== "");
+      const filledWords = words.filter(isFilled).length;
       const boardFull = Object.keys(grid).every((k) => (letters[k] || "") !== "");
 
       const check = () => {
@@ -618,7 +622,7 @@
             {items.map((w) => (
               <li key={w.idx}>
                 <button type="button"
-                  className={(activeWord && activeWord.idx === w.idx ? "on " : "") + (isSolved(w) ? "done" : "")}
+                  className={(activeWord && activeWord.idx === w.idx ? "on " : "") + (isFilled(w) ? "done" : "")}
                   onClick={() => selectWord(w)}>
                   <span className="n">{w.n}</span><span className="t">{w.clue}</span>
                 </button>
@@ -633,8 +637,11 @@
           <div className="app">
             <div className="top">
               <h1>תשחץ מבצע יונתן</h1>
-              <div className="bar"><i style={{ width: `${(solvedWords / words.length) * 100}%` }} /></div>
-              <span className="cnt">{solvedWords}/{words.length}</span>
+              <div className="bar" role="progressbar" aria-valuemin={0} aria-valuemax={words.length}
+                aria-valuenow={filledWords} aria-label="מילים שמולאו">
+                <i style={{ width: `${(filledWords / words.length) * 100}%` }} />
+              </div>
+              <span className="cnt">{filledWords}/{words.length}</span>
             </div>
 
             <div className={"clue" + (activeWord ? "" : " empty")} aria-live="polite">
